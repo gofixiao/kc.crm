@@ -1,0 +1,138 @@
+<div>
+	<ul class="nav pull-left">
+		<li class="pull-left">查找条件：
+			<select style="width:auto" name="field" id="field" onchange="changeCondition()">
+				<option class="role" value="owner_role_id">负责人</option>
+				<option class="word" value="name">公司名</option>
+				<option class="word" value="contacts_name">联系人姓名</option>
+				<option class="word" value="mobile">手机</option>
+				<option class="word" value="email">电子邮箱</option>
+			</select>&nbsp;&nbsp;
+		</li>
+		<li id="conditionContent" class="pull-left">
+			<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+				<option value="contains">包含</option>
+				<option value="not_contain">不包含</option>
+				<option value="is">是</option>
+				<option value="isnot">不是</option>						
+				<option value="start_with">开始字符</option>
+				<option value="end_with">结束字符</option>
+				<option value="is_empty">为空</option>
+				<option value="is_not_empty">不为空</option>
+			</select>&nbsp;&nbsp;
+		</li>
+		<li id="searchContent" class="pull-left">
+			<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+		</li>
+		<li class="pull-left">
+			<button type="submit" class="btn" onclick="d_changeCondition(0)">搜索</button>
+		</li>
+		&nbsp;<a target="_blank" href="{:U('leads/add')}">新建线索</a>
+	</ul>
+</div>
+<p>&nbsp;</p>
+<empty name="leadsList">
+	<div class="alert">暂无数据！</div>
+<else/>
+	<table class="table table-hover">
+			<thead>
+				<tr> 
+					<th></th>
+					<th width="40%">公司名</th>
+					<th width="20%">联系人</th>
+					<th width="18%">手 机</th>
+					<th width="18%">邮 箱</th>
+				</tr>
+			</thead>
+			<tfoot id="footer">
+				<tr>
+					<td colspan="5">
+						<div class="row pagination">
+							<div class="span2"><span id="count">{$count_num}</span> 条记录 <span id="p">1</span>/<span id="total_page">{$total}</span> 页</div>
+							<div class="span4">
+								<div><ul id="changepage">
+									<li><span class='current'>首页</span></li><li><span>« 上一页</span></li>
+									<if condition="1 lt $total">
+										<li><a class="page" href="javascript:void(0)" rel="2">下一页 »</a></li>
+									<else />
+										<li><span>下一页 »</span></li>
+									</if>
+								</ul></div>
+							</div>
+						</div>
+					</td>
+				</tr>
+			</tfoot>
+			<tbody id="load" class="hide">
+				<tr><td class="tdleft" <if condition="C('ismobile') neq 1">colspan="5"<else />colspan="5"</if> style=" height:300px;text-align:center"><img src="./Public/img/load.gif"></td></tr>
+			</tbody>
+			<tbody id="data">
+				<volist name="leadsList" id="vo">
+					<tr> 
+						<td><input type="radio" name="leads" value="{$vo.leads_id}"/></td>
+						<td>{$vo.name}</td>
+						<td>{$vo.contacts_name}</td>
+						<td>{$vo.mobile}</td>
+						<td>{$vo.email}</td>
+					</tr>
+				</volist>
+			</tbody>
+	</table>
+<script type="text/javascript">
+	$('.page').click(function(){
+		var a = $(this).attr('rel');
+		d_changeCondition(a);
+	});
+	function d_changeCondition(p){
+		$('#data').addClass('hide');
+		$('#load').removeClass('hide');
+		
+		var field = $('#field').val();
+		var condition = $('#condition').val();
+		var asearch = encodeURI($("#search").val());
+		$.ajax({
+			type:'get',
+			url:'index.php?m=leads&a=changecontent&field='+field+'&search='+asearch+'&condition='+condition+'&p='+p,
+			async:false,
+			success:function(data){
+				var temp = '';
+				if(data.data.list != null){
+					$.each(data.data.list, function(k, v){
+						temp += "<tr><td><input type='radio' name='leads' value='"+v.leads_id+"'/></td><td>" + v.name + "</td><td>" + v.contacts_name + "</td><td>"+v.mobile+"</td><td>"+v.email+"</td></tr>";
+					});
+					var changepage = "";
+					if(data.data.p == 1){
+						changepage = "<li><span class='current'>首页</span></li><li><span>« 上一页 </span></li>";
+						if(data.data.p < data.data.total){
+							changepage += "<li><a class='page' href='javascript:void(0)' rel='"+(data.data.p+1)+"'>下一页 »</a></li>";
+						}else{
+							changepage += "<li><span>下一页 »</span></li>";
+						}
+					}else if(data.data.p == data.data.total){
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><span>下一页 »</span></li>";
+					}else if(data.data.p == data.data.total){
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><span>下一页 »</span></li>";
+					}else{
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p+1)+"'>下一页 »</a></li>";
+					}
+					$('#p').html(data.data.p);
+					$('#changepage').html(changepage);
+					$('#count').html(data.data.count);
+					$('#total_page').html(data.data.total);
+					$('#data').html(temp);
+					$('.page').click(function(){
+						var a = $(this).attr('rel');
+						d_changeCondition(a);
+					});
+				}else{
+					$('#data').html('<tr><td colspan="4">没有找到您要的结果！</tr>');
+					$('#footer').addClass('hide');
+				}
+				$('#load').addClass('hide');
+				$('#data').removeClass('hide');
+			},
+			dataType:'json'
+		});		
+	}
+</script>
+</empty>

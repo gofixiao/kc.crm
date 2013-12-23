@@ -1,0 +1,166 @@
+<include file="Public:header" />
+<script type="text/javascript" src="__PUBLIC__/js/kindeditor-all-min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/zh_CN.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/kindeditor.css" type="text/css" />
+<script type="text/javascript">
+	<if condition="C('ismobile') neq 1">
+		var editor;
+		KindEditor.ready(function(K) {
+			editor = K.create('textarea[name="content"]', {
+				uploadJson:'{:U("file/editor")}',
+				allowFileManager : true,
+				loadStyleMode : false
+			});
+		});
+	</if>
+</script>
+<div class="container">
+	<div class="page-header">
+		<h4>合同编辑</h4>
+	</div>
+	<include file="Public:alert"/>
+	<div class="row">
+		<div class="tabbable span12">
+			<div class="tab-content">
+				<div class="tab-pane active" id="tab1">
+				<form action="{:U('contract/edit')}" method="post">
+				<input type="hidden" name="id" value="{$info.contract_id}">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<td>&nbsp;</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input type="button" class="btn" onclick="javascript:history.go(-1)" value="返回"/></td>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td>&nbsp;</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input type="button" class="btn" onclick="javascript:history.go(-1)" value="返回"/></td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<tr><th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>基本信息</th></tr>
+							<tr>
+								<td class="tdleft">合同编号</td>
+								<td>{$info.number}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">商机(单击选择)</td>
+								<td><input type="hidden" name="business_id" id="business_id" value="{$info.business_id}"/><input type="text" name="business_name" id="business_name" value="{$info.business_name}"> </td>
+							</tr>
+							<tr>
+								<td class="tdleft">联系人</td>
+								<td><input type="text" readonly="readonly" id="contacts_name" value="{$info.contacts_name}"/></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">客户</td>
+								<td><input type="text" readonly="readonly" id="customer_name" value="{$info.customer_name}"> </td>
+							</tr>
+							<tr>
+								<td class="tdleft">负责人(单击选择)</td>
+								<td><input type="hidden" name="owner_role_id" id="owner_id" value="{$info.owner_role_id}"/>
+								<input type="text" name="owner_role_name" id="owner_name" value="{$info.owner_name}"/></td>
+								
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">报价</td>
+								<td><input type="text" name="price" id="price" value="{$info.price}"/></td>
+							</tr>
+							<tr>
+								<td class="tdleft">合同生效时间</td>
+								<td>
+									<input type="text" id="start_date" name="start_date" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:&quot;#F{$dp.$D('end_date')||'2020-10-01'}&quot;})" class="span3 Wdate" <if condition="$info['start_date']">value="{$info['start_date']|date="Y-m-d",###}"</if>/>
+								</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">合同到期时间</td>
+								<td>
+									<input type="text" id="end_date" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:&quot;#F{$dp.$D(\'start_date\')}&quot;,maxDate:'2020-10-01'})" name="end_date" class="Wdate span3" <if condition="$info['end_date']">value="{$info['end_date']|date="Y-m-d",###}"</if>/>
+								</td>
+							</tr>
+							<tr>
+								<td class="tdleft">状态</td>
+								<td>
+									<select name="status">
+										<option value="已创建" <if condition="$info.status eq '已创建'">selected="selected"</if>>已创建</option>
+										<option value="已批准" <if condition="$info.status eq '已批准'">selected="selected"</if>>已批准</option>
+										<option value="履行完毕" <if condition="$info.status eq '履行完毕'">selected="selected"</if>>履行完毕</option>
+									</select>
+								</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">签约时间</td>
+								<td><input onclick="WdatePicker()"  type="text" id="due_time" name="due_time" value="{$info.due_time|date="Y-m-d",###}" /></td>
+							</tr>
+							<tr>
+								<td class="tdleft">合同条款</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><textarea class="span6" rows="3" name="content" id="content" style="width: 800px; height: 350px;">{$info.content}</textarea></td>
+							</tr><tr>
+								<td class="tdleft">描述</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><textarea class="span6" rows="3" name="description" id="description">{$info.description}</textarea></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div id="dialog-business" title="选择商机">loading...</div>
+<div id="dialog-role-list2" title="选择负责人">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+	$(function(){
+		$('#business_name').click(function () {
+			$('#dialog-business').dialog('open');
+			$('#dialog-business').load("{:U('business/listDialog')}");
+		});
+		
+		$('#owner_name').click(function () {
+			$('#dialog-role-list2').dialog('open');
+			$('#dialog-role-list2').load('{:U("user/listDialog")}');
+			return false;
+		});
+		
+	});
+	$('#dialog-business').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		buttons: {
+			"Ok": function () {
+				var item = $('input:radio[name="business"]:checked').val();
+				var name = $('input:radio[name="business"]:checked').parent().next().html();
+				var name2 = $('input:radio[name="business"]:checked').parent().next().next().find('a').html();
+				var name3 = $('input:radio[name="business"]:checked').parent().next().next().next().find('a').html();
+				$('#business_name').val(name);
+				$('#business_id').val(item);
+				$('#customer_name').val(name2);
+				$('#contacts_name').val(name3);
+				if ($('input[name="name"]').val() == "")$('input[name="name"]').val(name);
+				$(this).dialog("close");
+			},
+			"Cancel": function () {
+				$(this).dialog("close");
+			}
+		},
+		position:["center",100]
+	});
+	$("#dialog-role-list2").dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		buttons: { 
+			"Ok": function () {
+				var item = $('input:radio[name="owner"]:checked').val();
+				var name = $('input:radio[name="owner"]:checked').parent().next().html();
+				$('#owner_id').val(item);
+				$('#owner_name').val(name);
+				$(this).dialog("close"); 
+			},
+			"Cancel": function () {
+				$(this).dialog("close");
+			}
+		},
+		position: ["center", 100]
+	});
+</script>
+<include file="Public:footer" />	

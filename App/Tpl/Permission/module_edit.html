@@ -1,0 +1,20 @@
+<form class="form-horizontal" action="{U:('permission/module_edit')}" method="Post">
+	<div class="control-group">
+		<label class="control-label" for="name">模块名</label>
+		<div class="controls">
+			<input type="text" id="name" name="name" value="{$vo.name}"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="description">模块描述</label>
+		<div class="controls">
+			<textarea name="description" id="description">{$vo.description}</textarea> 
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">&nbsp;</label>
+		<div class="controls">
+			<input class="btn" type="submit" value=" 添 加 "> <input class="btn" type="reset" value=" 重 置 ">
+		</div>
+	</div>
+</form>

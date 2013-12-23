@@ -1,0 +1,98 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>编辑财务活动</h4>
+	</div>
+	<include file="Public:alert" />	
+	<div class="row">
+		<div class="span12">
+			<form action="{:U('finance/edit')}" method="post">				
+				<input type='hidden' name="finance_id" value="{$finance.finance_id}"/>
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<tr>
+							<th colspan="4">基本信息</th>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%">财务活动名</td>
+							<td ><input name="name" id="name" class="text-input large-input" type="text" value="{$finance.name}"/></td>
+						</tr>				
+						<tr>
+							<td class="tdleft" width="20%">审核人</td>
+							<td>
+								<input type="hidden" id="check_role_id" name="check_role_id" value="{$finance.checker.role_id}"/><input id="check_user" name="check_user" type="text" value="{$finance.checker.user_name}"/>
+							</td>
+						</tr>
+						<if condition="$Think.session.role_id eq $finance['check_role_id']">
+						<tr>
+							<td class="tdleft" width="20%">审核状态</td>
+							<td><input  type="radio" <if condition="$finance['check_result'] eq '0'">checked="checked"</if> name="check_result" value="-1"/> 未审核 <input  type="radio" <if condition="$finance['check_result'] eq '1'">checked="checked"</if> name="check_result" value="1"/> 审核通过 <input  type="radio" <if condition="$finance['check_result'] eq '-1'">checked="checked"</if> name="check_result" value="-1"/> 审核拒绝</td>
+						</tr>
+						</if>
+						<tr>
+							<td class="tdleft" width="20%">应收(付)金额</td>
+							<td><input class="text-input large-input" id="plan_money" name="plan_money" type="text" value="<if condition="$finance.plan_money neq 0">{$finance.plan_money}</if>"/></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%">实收(付)金额</td>
+							<td><input class="text-input large-input" id="money" name="money" type="text" value="<if condition="$finance.money neq 0">{$finance.money}</if>"/></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%">类别</td>
+							<td><input  type="radio" <if condition="$finance.income_or_expenses eq -1">checked="checked"</if> name="income_or_expenses" value="-1"/> 支出 <input  type="radio" <if condition="$finance.income_or_expenses eq 1">checked="checked"</if> name="income_or_expenses" value="1"/> 收入 </td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%">描述</td>
+							<td><textarea class="span6" rows="6" name="description">{$finance.description}</textarea></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div> <!-- End #tab1 -->	
+	</div> <!-- End #main-content -->	
+</div>
+<div id="dialog-message" title="选择审核人">loading...</div>
+<script type="text/javascript">
+$("#dialog-message").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			if(item){
+				$('#check_user').val(name);
+				$('#check_role_id').val(item);
+			}	
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$(function(){
+	$("#check_user").click(
+		function(){
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load('{:U("user/listDialog")}');
+		}
+	);
+});
+</script>
+<include file="Public:footer" />	

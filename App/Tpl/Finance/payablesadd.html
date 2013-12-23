@@ -1,0 +1,195 @@
+<include file="Public:header" />
+<div class="container">
+	
+	<div class="page-header">
+		<h4>财务<small> - <a href="{:U('finance/index','t=receivables')}">应收款</a> | 
+		<a class="active" href="{:U('finance/index','t=payables')}">应付款</a> | 
+		<a href="{:U('finance/index','t=receivingorder')}">收款单</a> | 
+		<a href="{:U('finance/index','t=paymentorder')}">付款单</a> | <a href="{:U('finance/analytics')}">统计</a></small> </h4>
+	</div>
+	<include file="Public:alert" />	
+	<div class="row">
+		<div class="span12">
+			<form action="{:U('finance/add','t=payables')}" method="post">				
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <if condition="C('ismobile') neq 1"><input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp; </if><input class="btn" type="button" onclick="javascript:history.go(-1)" value="取消"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;  <if condition="C('ismobile') neq 1"><input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp;</if> <input class="btn" type="button" onclick="javascript:history.go(-1)" value="取消"/></td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<tr>
+							<th colspan="2">添加应付款</th>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">应付款名</td>
+							<td valign="middle"><input name="name" id="name" class="text-input large-input" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">合同(单击选择)</td>
+							<td valign="middle"><input name="contract_id" id="contract_id" type="hidden" /><input name="contract_name" id="contract_name" class="text-input large-input" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">*客户(单击选择)</td>
+							<td valign="middle"><input name="customer_id" id="customer_id" type="hidden" /><input name="customer" id="customer" class="text-input large-input" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">负责人(单击选择)</td>
+							<td valign="middle"><input name="owner_role_id" id="owner_role_id" type="hidden" value="{$Think.session.role_id}"/><input name="owner_name" id="owner_name" value="{$Think.session.name}" class="text-input large-input" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">应付金额</td>
+							<td valign="middle"><input class="text-input large-input" id="price" name="price" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">付款单</td>
+							<td valign="middle"> &nbsp; <input type="checkbox" name="check_add_order" id="check_add_order" value="1"/>&nbsp;同时创建付款单<br/>
+								<table id="add_order" class="hide">
+									<tr>
+										<td class="tdleft" width="20%" valign="middle">付款单号</td>
+										<td valign="middle"><input name="order_name" class="text-input large-input" type="text" value="自动生成"/></td>
+									</tr>
+									<tr>
+										<td class="tdleft" valign="middle">付款金额</td>
+										<td valign="middle"><input class="text-input large-input" name="order_money" type="text" /></td>
+									</tr>
+									<tr>
+										<td class="tdleft" valign="middle">付款时间</td>
+										<td valign="middle"><input onclick="WdatePicker()"  type="text" name="order_pay_time"/></td>
+									</tr>
+									<tr>
+										<td class="tdleft" valign="middle">状态</td>
+										<td valign="middle"><input  type="radio" checked="checked" name="order_status" value="0"/> 未结账 <input type="radio"  name="order_status" value="1"/> 已结账 </td>
+									</tr>
+									<tr>
+										<td class="tdleft" valign="middle">描述</td>
+										<td valign="middle"><textarea class="span4" rows="6" name="order_description"></textarea></td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">应付款时间</td>
+							<td valign="middle"><input onclick="WdatePicker()"  type="text" id="pay_time" name="pay_time"/></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">描述</td>
+							<td valign="middle"><textarea class="span6" rows="6" name="description"></textarea></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div> <!-- End #tab1 -->	
+	</div> <!-- End #main-content -->	
+</div>
+<div id="dialog-message" title="选择客户">loading...</div>
+<div id="dialog-message2" title="选择合同">loading...</div>
+<div id="dialog-message3" title="选择负责人">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-message").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="customer"]:checked').val();
+			var name = $('input:radio[name="customer"]:checked').parent().next().html();
+			if(item){
+				$('#customer').val(name);
+				$('#customer_id').val(item);
+			}
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$("#dialog-message2").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="contract"]:checked').val();
+			var name = $('input:radio[name="contract"]:checked').parent().next().html();
+			var next_item = $('input:radio[name="contract"]:checked').parent().next().next().html();
+			var next_name = $('input:radio[name="contract"]:checked').parent().next().next().next().html();
+			if(item){
+				$('#contract_name').val(name);
+				$('#contract_id').val(item);
+				$('#customer_id').val(next_item);
+				$('#customer').val(next_name);
+			}
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$("#dialog-message3").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			if(item){
+				$('#owner_name').val(name);
+				$('#owner_role_id').val(item);
+			}
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$(function(){
+	$("#customer").click(
+		function(){
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load('{:U("customer/listDialog","by=all")}');
+		}
+	);
+	$("#contract_name").click(
+		function(){
+			$('#dialog-message2').dialog('open');
+			$('#dialog-message2').load('{:U("contract/listDialog","by=all")}');
+		}
+	);
+	$("#owner_name").click(
+		function(){
+			$('#dialog-message3').dialog('open');
+			$('#dialog-message3').load('{:U("user/listDialog","by=all")}');
+		}
+	);
+	$("#check_add_order").click(
+		function(){
+			is_checked = $(this).prop("checked");
+			if(is_checked){
+				$('#add_order').show();
+			}else{
+				$('#add_order').hide();
+			}
+		}
+	);
+});
+</script>
+<include file="Public:footer" />	

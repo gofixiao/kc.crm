@@ -1,0 +1,122 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="page-header">
+			<h4>系统设置</h4>
+		</div>
+		<include file="Public:alert" />
+		<div class="tabbable">
+			<ul class="nav nav-tabs">
+				<li><a href="{:U('setting/defaultInfo')}">系统基本设置</a></li>
+				<li><a href="{:U('setting/smtp')}">SMTP设置</a></li>
+				<li class="active"><a href="{:U('setting/fields')}">自定义字段设置</a></li>		
+				<li><a href="{:U('navigation/setting')}">系统菜单设置</a></li>
+				<li><a href="{:U('setting/weixin')}">微信公共账号设置</a></li>
+			</ul>
+		</div>
+		<div class="row">	
+			<div class="span2 knowledgecate">
+				<ul class="nav nav-list">
+					<li class="active">
+						<a href="javascript:void(0);" onclick="color_box()">自定义字段设置</a>
+					</li>
+					<li><a href="{:U('setting/fields', 'model=customer')}"><i class="icon-chevron-right"></i>客户字段设置</a></li>
+					<li><a href="{:U('setting/fields', 'model=business')}"><i class="icon-chevron-right"></i>商机字段设置</a></li>
+					<li><a href="{:U('setting/fields', 'model=product')}"><i class="icon-chevron-right"></i>产品字段设置</a></li>
+					<li><a href="{:U('setting/fields', 'model=leads')}"><i class="icon-chevron-right"></i>线索字段设置</a></li>
+					<li><a href="{:U('knowledge/category')}" class="active"><i class="icon-chevron-right"></i>知识分类</a></li>
+				</ul>
+			</div>
+			<form action="{:U('knowledge/categoryDelete')}" method="post">
+				<div class="span10">
+					<p><div class="bulk-actions align-left">
+						<button type="submit" class="btn" ><i class="icon-remove"></i>&nbsp;删除</button>
+						<div class="pull-right">
+							<a class="btn btn-primary" id="add_category" href="javascript:void(0);">添加知识类别</a>
+						</div>
+					</div></p>
+				</div>
+				<div class="span10">
+					<table class="table" width="95%" border="0" cellspacing="1" cellpadding="0">
+						<thead>
+							<tr>
+								<th width="15%"><input class="check_all" name="check_all" id="check_all" type="checkbox" /> &nbsp;</th>
+								<th width="15%">分类名</th>
+								<th width="10%">文章数</th>
+								<th width="35%">分类描述</th>
+								<th width="15%">操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="5">
+									{$page}
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<volist name="category_list" id="vo">
+								<tr>
+									<td>
+									<input class="list" type="checkbox" id="category" name="category_list[]" value="{$vo.category_id}"/> &nbsp;
+									</td>
+									<td>{$vo.name}</td>
+									<td>{$vo.count}</td>
+									<td>
+										{$vo.description}
+									</td>
+									<td><a class="edit_category" rel="{$vo.category_id}" href="javascript:void(0)">编辑</a> &nbsp;
+									<a href="{:U('knowledge/index','by=all&category_id='.$vo['category_id'])}">查看本类</a></td>
+								</tr>
+							</volist>
+						</tbody>
+					</table>
+				</div> <!-- End #main-content -->
+			</form>
+		</div>		
+	</div>
+	<div id="dialog-message1" class="hide" title="添加文章类别">loading...</div>
+	<div id="dialog-message2" class="hide" title="编辑分类信息">loading...</div>
+<script type="text/javascript">
+	function changeContent(){
+		a = $("#select1  option:selected").val();
+		if(a=='1'){
+			window.location.href="{:U('knowledge/index')}";
+		}else if(a=='2'){
+			window.location.href="{:U('knowledge/category')}";
+		}else if(a=='3'){
+			window.location.href="{:U('knowledge/count')}";
+		}
+	}
+
+	$('#dialog-message1').dialog({
+		autoOpen: false,
+		modal: true,
+		width: 600,
+		maxHeight: 400,
+		position :["center",100]
+	});
+
+	$('#dialog-message2').dialog({
+		autoOpen: false,
+		modal: true,
+		width: 600,
+		maxHeight: 400,
+		position :["center",100]
+	});
+
+	$(function(){
+		$("#check_all").click(function(){
+			$("input[class='list']").prop('checked', $(this).prop("checked"));
+		});
+		$("#add_category").click(function(){
+			$('#dialog-message1').dialog('open');
+			$('#dialog-message1').load('{:U('knowledge/categoryAdd')}');
+		});
+		$(".edit_category").click(function(){
+			$('#dialog-message2').dialog('open');
+			$id = $(this).attr('rel');
+			$('#dialog-message2').load("{:U('knowledge/categoryEdit','id=')}"+$id);
+		});
+	});
+</script>
+<include file="Public:footer" />

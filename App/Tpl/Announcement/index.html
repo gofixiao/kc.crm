@@ -1,0 +1,152 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="page-header">
+			<h4>公告列表</h4>
+		</div>
+		<include file="Public:alert" />
+		<div class="row">
+			<div class="span12">
+				<div class="bulk-actions align-left">
+					<div class="pull-left"><a id="delete"  class="btn" style="margin-right: 5px;"><i class="icon-remove"></i>&nbsp;删除</a></div>
+					
+					<ul class="nav pull-left">
+						<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="" method="get">
+							<li class="pull-left">
+								&nbsp;
+								<select style="width:auto" id="field" name="field" id="selectCondition" onchange="changeCondition()">
+									<option class="all" value="all">任意字段</option>
+									<option class="word" value="title">标题</option>
+									<option class="word" value="content">内容</option>
+									<option class="role" value="role_id">作者</option>
+									<option class="date" value="create_time">创建时间</option>
+									<option class="date" value="update_time">修改时间</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="conditionContent" class="pull-left">
+							<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">		
+								<option value="contains">包含</option>
+								<option value="is">是</option>
+								<option value="start_with">开始字符</option>
+								<option value="end_with">结束字符</option>
+								<option value="is_empty">为空</option>
+							</select>&nbsp;&nbsp;
+							</li>
+							<li id="searchContent" class="pull-left">
+								<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+							</li>
+							<li class="pull-left">
+								<input type="hidden" name="m" value="announcement"/>
+								<if condition="$Think.get.by neq null"><input type="hidden" name="category_id" value="{$Think.get.category_id}"/></if>
+								<button type="submit" class="btn"> <img src="__PUBLIC__/img/search.png"/>  搜索</button>
+							</li>
+						</form>
+					</ul>
+				</div>
+				<div class="pull-right">
+						<a class="btn btn-primary" href="{:U('announcement/add')}"><i class="icon-plus"></i>&nbsp; 添加公告</a>
+					</div>
+			</div>
+			<div class="span12">
+				<form id="form1"  method="Post">
+					<table class="table table-hover">
+						<if condition="$list eq null">
+							<tr><td>----暂无数据！----</td></tr>
+						<else/>
+						<thead>
+							<tr>
+							   <th><input class="check_all" name="check_all" id="check_all" type="checkbox" /> &nbsp;</th>
+							   <th>标题</th>
+							   <th>作者</th>
+							   <if condition="C('ismobile') neq 1">
+							   <th>更新时间</th>
+							   <th>当前状态</th>
+							   </if>
+							   <th>操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="7">
+									{$page}
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<volist name="list" id="vo">
+								<tr>
+									<td>
+										<input class="list" type="checkbox" name="announcement_id[]" value="{$vo.announcement_id}"/>
+									</td>
+									<td><a href="{:U('announcement/view','id='.$vo['announcement_id'])}">{$vo.title}</a></td>
+									<td><notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty></td>
+									<if condition="C('ismobile') neq 1">
+									<td><notempty name="vo.update_time">{$vo.update_time|date="Y-m-d",###}<notempty></td>
+									<td><if condition="$vo['status'] == 1"><span style="color:green;"><i class="icon-ok-circle"></i>发布中</span><else /><span style="color:red;"><i class="icon-remove-circle"></i>已停用</span></if> </td>
+									</if>
+									<td><a href="{:U('announcement/changestatus','id='.$vo['announcement_id'])}"><if condition="$vo['status'] == 1">停用<else />发布</if></a> &nbsp;<a href="{:U('announcement/view','id='.$vo['announcement_id'])}">查看</a> &nbsp;<a href="{:U('announcement/edit','id='.$vo['announcement_id'])}">编辑</a></td>
+								</tr>
+							</volist>
+						</tbody>
+						</if>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+$("#dialog-import").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+
+	function deleteConfirm(id,name){
+		if(confirm("是否删除文章"+name)){
+			window.location="{:U('announcement/delete','id=')}"+id;
+		}
+	}
+	function searchByCategory(){
+		var objCategory=document.getElementById("categoryList");
+		var id=objCategory.options[objCategory.selectedIndex].value;
+		window.location="{:U('announcement/index','by=all&category_id=')}"+id;
+	}
+
+$(function(){
+<if condition="$Think.get.field neq null">
+	$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+	$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+	$("#search").prop('value', '{$Think.get.search}');
+</if>
+
+	$("#check_all").click(function(){
+		$("input[class='list']").prop('checked', $(this).prop("checked"));
+	});
+	$("#add_category").click(function(){
+		$('#dialog-message1').dialog('open');
+		$('#dialog-message1').load("{:U('announcement/categoryAdd')}");
+	});
+	$('#delete').click(function(){
+		$("#form1").attr('action', '{:U("announcement/delete")}');
+		$("#form1").submit();
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+});
+</script>
+<include file="Public:footer" />
+

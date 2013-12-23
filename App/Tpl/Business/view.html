@@ -1,0 +1,691 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4><a name="tab">商机详情</a></h4>
+	</div>
+	<include file="Public:alert"/>
+	<div class="row">
+		<div class="tabbable span12">
+			<ul class="nav nav-tabs">
+				<li><a href="#tab1">基本信息</a></li>
+				<li><a href="#tab7">合同({$business['contract_count']})</a></li>
+				<li><a href="#tab8">应收款({$business['receivables_count']})</a></li>
+				<li><a href="#tab9">应付款({$business['payables_count']})</a></li>
+				<li><a href="#tab2">产品({$business['product_count']})</a></li>
+				<li><a href="#tab3">沟通日志({$business['log_count']})</a></li>
+				<li><a href="#tab4">任务({$business['task_count']})</a></li>
+				<li><a href="#tab5">日程({$business['event_count']})</a></li>
+				<li><a href="#tab6">附件({$business['file_count']})</a></li>
+			</ul>
+			<div class="tab-content">
+					<table class="table table-hover">
+						<thead>
+							<tr> 
+								<td colspan="4">
+									<p style="font-size: 14px;">
+										<if condition="$business['is_deleted'] == 0">
+											<a href="javascript:void(0);" class="advance">推进</a> | 
+											<a href="{:U('business/edit', 'id='.$business['business_id'])}">编辑</a> | 
+											<a href="javascript:void(0);" class="add_product">添加产品</a> | 
+											<a href="javascript:void(0);" class="add_log">添加沟通日志</a> | 
+											<a href="javascript:void(0);" class="add_task">添加任务</a> | 
+											<a href="javascript:void(0);" class="add_event">添加日程</a> | 
+											<a href="javascript:void(0);" class="add_file">添加附件</a> | 
+											<a href="{:U('business/delete', 'id='.$business['business_id'])}">删除</a> | 	
+											<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+										<else />
+											<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+										</if>
+									</p>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tbody>
+							<tr><th colspan="2">基本信息</th></tr>
+							<if condition="$customer['is_deleted'] eq 1">
+								<tr>
+									<td class="tdleft">删除人</td>
+									<td><a class="role_info" href="javascript:void(0)" rel="{$customer.deleted.role_id}">{$customer.deleted.user_name}</a></td>
+								</tr><tr>
+									<td class="tdleft" width="15%">删除时间</td>
+									<td>{$customer.delete_time|date='Y-m-d H:i:s',###}</td>
+								</tr>
+							</if>
+							<tr>
+								<td class="tdleft">负责人</td>
+								<td><a class="role_info" href="javascript:void(0)" rel="{$business.owner.role_id}">{$business.owner.user_name}</if></a></td>
+							</tr>
+							<tr>
+								<td class="tdleft" width="15%">创建时间</td>
+								<td><if condition="$business['create_time'] neq 0">{$business.create_time|date='Y-m-d H:i:s',###}</if></td>
+							</tr>
+							<tr>
+								<td class="tdleft" width="15%">上次推进时间</td>
+								<td><if condition="$business['update_time'] neq 0">{$business.update_time|date='Y-m-d H:i:s',###}<else />暂无</if></td>
+							</tr>
+							<volist name="field_list" id="vo">
+								<tr><td class="tdleft" width="15%">{$vo[name]}</td>
+								<td>
+									<span style="color:#{$vo['color']}">
+									<if condition="$vo['form_type'] eq 'datetime'">
+										<if condition="$business[$vo['field']] gt 0">{$business[$vo['field']]|date='Y-m-d',###}</if>
+									<elseif condition="$vo['field'] eq 'customer_id'"/>
+										{$business['customer']['name']}
+									<elseif condition="$vo['field'] eq 'contacts_id'"/>
+										{$business['contacts']['name']}
+									<else />
+										{$business[$vo['field']]}
+									</if>
+									</span>
+								</td>
+								</tr>
+							</volist>
+						</tbody>
+						</tbody>
+					</table>
+					<h5>推进历史</h5>
+					<table class="table table-hover">
+						<if condition="$business.bsList eq null">
+							<tr>
+								<th>没有数据</th>
+							</tr>
+						<else />
+						<thead>
+							<tr>
+								<th>时间</th>
+								<th>阶段</th>								
+								<th>阶段描述</th>
+								<th>负责人</th>
+							</tr>
+						</thead>
+						<tbody>
+							<volist name="business.bsList" id="vo">
+							<tr>
+								<td width="10%">
+									<if condition="$vo['update_time'] neq 0">
+										{$vo.update_time|date="Y-m-d H:i",###}
+									<else />
+										{$business.create_time|date='Y-m-d H:i',###}</if>
+								</td>
+								<td>{$vo.status_name}</td>
+								<td>{$vo.description}</td>
+								<td><notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty></td>
+								
+							</tr>
+							</volist>
+						</tbody>
+						</if>
+					</table>
+                    <a name="tab7"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关合同</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table table-hover">
+						<if condition="$business.contract eq null">
+							<tr>
+								<td>没有数据</td>
+							</tr>
+						<else /> 
+							<tr>
+								<td width="10%">&nbsp;</td>
+								<td>合同编号</td>
+								<td>签约时间</td>
+								<td>报价</td>
+								<td>负责人</td>
+								<td>创建时间</td>
+							</tr>
+							<volist name="business.contract" id="vo">
+								<tr>
+									<td class="tdleft"><if condition="$business['is_deleted'] == 0"><a target="_blank" href="{:U('contract/view','id='.$vo['contract_id'])}">查看</a> &nbsp; <a target="_blank" href="{:U('contract/edit','id='.$vo['contract_id'])}">编辑</a></if></td>
+									<td>
+										<a target="_blank" href="{:U('contract/view','id='.$vo['contract_id'])}">{$vo.number}</a>
+									</td>									
+									<td><notempty name="vo.due_time">{$vo.due_time|date="Y-m-d",###}</notempty></td>
+									<td>
+										{$vo.price}
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td><notempty name="vo.create_time">{$vo.create_time|date="Y-m-d",###}</notempty></td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$business['is_deleted'] == 0">
+							<tr>
+								<td colspan="6">
+									<a href="javascript:void(0);" class="add_contract">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab8"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>应收款</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+                    <table class="table">
+                        <if condition="$business.receivables eq null">
+                            <tr>
+                                <td>没有数据 </td>
+                            </tr>
+                        <else /> 
+                        <thead>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>应收款名</td>
+                                <td>合同</td>
+                                <td>状态</td>
+                                <if condition="C('ismobile') neq 1">
+                                <td>金额</td>
+                                <td>负责人</td>
+                                </if>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <volist name="business.receivables" id="vo">
+                                <tr>
+                                    <td class="tdleft"><a href="{:U('finance/view', 't=receivables&id='.$vo['receivables_id'])}">查看</a></td>
+                                    <td>
+                                        <a href="{:U('finance/view', 't=receivables&id='.$vo['receivables_id'])}">{$vo.name}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{:U('contract/view', 'id='.$vo['contract_id'])}">{$vo.contract_name}</a>
+                                    </td>
+                                    <td>
+                                        <if condition="$vo['status'] eq 2">已收款<elseif condition="$vo['status'] eq 1" />部分已收<else />未收款</if>
+                                    </td>
+                                    <if condition="C('ismobile') neq 1">
+                                    <td>
+                                        <if condition="$vo['price'] gt 0">{$vo.price}</if>
+                                    </td>
+                                    <td>
+                                        <notempty name="vo.owner.user_name">
+                                        <a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a>
+                                        </notempty>
+                                    </td>
+                                    </if>
+                                </tr>
+                            </volist>
+                        </tbody>
+                    </if>
+                        <tr>
+                            <td <if condition="C('ismobile') neq 1">colspan="6"<else/>colspan="4"</if>>
+                                <if condition="$business['is_deleted'] == 0"><a target="_blank" href="{:U('finance/add','t=receivables')}">添加</a></if>
+                            </td>
+                        </tr>
+                    </table>
+                    <a name="tab9"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>应付款</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+                        <if condition="$business.payables eq null">
+                            <tr>
+                                <td>没有数据 </td>
+                            </tr>
+                        <else /> 
+                        <thead>
+                            <tr>
+                                <td>&nbsp;</td>
+                                <td>应付款名</td>
+                                <td>合同</td>
+                                <td>状态</td>
+                                <if condition="C('ismobile') neq 1">
+                                <td>金额</td>
+                                <td>负责人</td>
+                                </if>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <volist name="business.payables" id="vo">
+                                <tr>
+                                    <td class="tdleft"><a href="{:U('finance/view', 't=payables&id='.$vo['payables_id'])}">查看</a></td>
+                                    <td>
+                                        <a href="{:U('finance/view', 't=payables&id='.$vo['payables_id'])}">{$vo.name}</a>
+                                    </td>
+                                    <td>
+                                        <a href="{:U('contract/view', 'id='.$vo['contract_id'])}">{$vo.contract_name}</a>
+                                    </td>
+                                    <td>
+                                        <if condition="$vo['status'] eq 2">已付款<elseif condition="$vo['status'] eq 1" />部分已付<else />未付款</if>
+                                    </td>
+                                    <if condition="C('ismobile') neq 1">
+                                    <td>
+                                        <if condition="$vo['price'] gt 0">{$vo.price}</if>
+                                    </td>
+                                    <td>
+                                        <notempty name="vo.owner.user_name">
+                                        <a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a>
+                                        </notempty>
+                                    </td>
+                                    </if>
+                                </tr>
+                            </volist>
+                        </tbody>
+                        </if>
+                        <tr>
+                            <td <if condition="C('ismobile') neq 1">colspan="6"<else/>colspan="4"</if>>
+                                <if condition="$business['is_deleted'] == 0"><a target="_blank" href="{:U('finance/add','t=payables')}" >添加</a></if>
+                            </td>
+                        </tr>
+                    </table>
+                    <a name="tab2"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关产品</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$business.product eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<thead>
+								<tr>
+									<td>&nbsp;</td>
+									<td>产品名</td>
+									<if condition="C('ismobile') neq 1">
+									<td>产品类别</td>
+									<td>报价(元)</td>
+									</if>
+									<td>交易价(元)</td>
+									<td>成本价(元)</td>
+									<if condition="C('ismobile') neq 1">
+									<td width="30%">备注</td>
+									</if>
+								</tr>
+							</thead>
+							<tbody>
+								<volist name="business.product" id="vo">
+									<tr>
+										<td class="tdleft">
+										<if condition="$business['is_deleted'] == 0">
+										<a href="{:U('product/mdelete', 'r=rBusinessProduct&id='.$vo['id'])}">删除</a>&nbsp;<a class="edit_product" href="javascript:void(0)" rel="{$vo.id}">编辑</a></if></td>
+										<td>
+											<a href="{:U('product/view', 'id='.$vo['product_id'])}">{$vo.info.name}</a>
+										</td>
+										<if condition="C('ismobile') neq 1">
+										<td>
+											{$vo.category_name}
+										</td>
+										<td>
+											<if condition="$vo['estimate_price'] gt 0">{$vo.estimate_price}</if>
+										</td>
+										</if>
+										<td>
+											<if condition="$vo['sales_price'] gt 0">{$vo.sales_price}</if>
+										</td>
+										<td>
+											<if condition="$vo['info']['cost_price'] gt 0">{$vo.info.cost_price}</if>
+										</td>
+										<if condition="C('ismobile') neq 1">
+										<td>
+											{$vo.description}
+										</td>
+										</if>
+									</tr>
+								</volist>
+							</tbody>
+						</if>
+						<if condition="$business['is_deleted'] == 0">
+							<tr>
+								<td colspan="7">
+									<a href="javascript:void(0);" class="add_product">添加</
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab3"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>沟通日志</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$business.log eq null">
+							<tr>
+								<td>没有数据</td>
+							</tr>
+						<else />
+							<volist name="business.log" id="vo">
+								<tr>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty> &nbsp; 
+										{$vo.create_date|date="Y-m-d  g:i:s a",###} &nbsp; 
+										<notempty name="vo.create_date"> &nbsp; </notempty>
+										<if condition="C('ismobile') eq 1"><br/></if>
+										{$vo.subject}
+									</td>
+									<td>
+										<if condition="$business['is_deleted'] neq 1"><a href="javascript:void(0)" rel="{$vo.log_id}" class="edit_log">编辑</a>&nbsp; <a href="{:U('log/delete','r=RBusinessLog&id='.$vo['log_id'])}">删除</a></if>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<if condition="strlen($vo['content']) gt 100">
+											<div id="slog_{$vo.log_id}">
+											<pre>{$vo.content|msubstr=###,0,100}
+											<a class="more" rel="{$vo.log_id}" href="javascript:void(0)">查看全文</a></pre>
+											</div>
+											<div id="llog_{$vo.log_id}" class="hide">
+												<pre>{$vo.content}</pre>
+											</div>
+										<else/>
+											<pre>{$vo.content}</pre>
+										</if>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$business['is_deleted'] neq 1">
+							<tr>
+								<td colspan="2">
+									<a href="javascript:void(0);" class="add_log">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab4"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关任务</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$business.task eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td>&nbsp;</td>
+								<td>主题</td>
+								<td>状态</td>
+								<td>执行者</td>
+								<td>到期日期</td>
+								<td>修改时间</td>
+							</tr>
+							<volist name="business.task" id="vo">
+								<tr>
+									<td class="tdleft" width="10%">
+										<if condition="$business['is_deleted'] == 0"><a href="{:U('task/view','id='.$vo['task_id'])}">查看</a>&nbsp; <a href="{:U('task/delete','id='.$vo['task_id'])}">删除</a>
+										<if condition="$vo.isclose eq 1"><a href="{:U('task/close','id='.$vo['task_id'])}">关闭</a><else />已关闭</if>
+										</if>
+									</td>
+									<td>
+										{$vo.subject}
+									</td>
+									<td>
+										{$vo.status}
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										<notempty name="vo.due_date">{$vo.due_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									<td>
+										<notempty name="vo.update_date">{$vo.update_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$business['is_deleted'] == 0">
+							<tr>
+								<td colspan="5">
+									<a href="javascript:void(0);" class="add_task">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab5"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关日程</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$business.event eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td>&nbsp;</td>
+								<td>主题</td>
+								<td>地点</td>
+								<td>负责人</td>
+								<td>开始时间</td>
+								<td>结束时间</td>
+							</tr>
+							<volist name="business.event" id="vo">
+								<tr>
+									<td class="tdleft" width="10%">
+										<if condition="$business['is_deleted'] == 0">
+										<a href="{:U('event/view', 'id='.$vo['event_id'])}">查看</a>&nbsp; <a href="{:U('event/delete', 'id='.$vo['event_id'])}">删除</a>&nbsp; 
+										<if condition="$vo.isclose eq 1"><a href="{:U('event/close', 'id='.$vo['event_id'])}">关闭</a><else />已关闭</if>
+										</if>
+									</td>
+									<td>
+										{$vo.subject}
+									</td>
+									<td>
+										{$vo.venue}
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										<notempty name="vo.start_date">{$vo.start_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									<td>
+										<notempty name="vo.end_date">{$vo.end_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$business['is_deleted'] == 0">
+							<tr>
+								<td colspan="6">
+									<a href="javascript:void(0);" class="add_event">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab6"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关文件</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table table-hover">
+						<if condition="$business.file eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td>&nbsp;</td>
+								<td>文件名</td>
+								<td>大小</td>
+								<td>添加者</td>
+								<td>添加时间</td>
+							</tr>
+							<volist name="business.file" id="vo">
+								<tr>
+									<td class="tdleft"><if condition="$business['is_deleted'] == 0"><a href="{:U('file/delete', 'r=RBusinessFile&id='.$vo['file_id'])}">删除</a></if></td>
+									<td>
+										<a target="_blank" href="{$vo.file_path}">{$vo.name}</a>
+									</td>
+									<td>
+										{$vo.size}字节
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$business['is_deleted'] == 0">
+							<tr>
+								<td colspan="5">
+									<a href="javascript:void(0);" class="add_file">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-file" title="添加附件">loading...</div>
+<div class="hide" id="dialog-log" title="添加日志">loading...</div>
+<div class="hide" id="dialog-log-edit" title="编辑日志">loading...</div>
+<div class="hide" id="dialog-task" title="添加任务">loading...</div>
+<div class="hide" id="dialog-event" title="添加日程">loading...</div>
+<div class="hide" id="dialog-product" title="添加产品">loading...</div>
+<div class="hide" id="dialog-edit" title="修改商机产品信息">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<div class="hide" id="dialog-contract" title="添加合同">loading...</div>
+<div class="hide" id="dialog-advance" title="商机推进">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-advance").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-contract").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-file").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight:400,
+	position: ["center",100]
+});
+$("#dialog-log").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight:400,
+	position: ["center",100]
+});
+$("#dialog-task").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	position: ["center",100]
+});
+$("#dialog-event").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight:400,
+	position: ["center",100]
+});
+$("#dialog-log-edit").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-product").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight:400,
+	position: ["center",100]
+});
+$("#dialog-edit").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight:400,
+	position: ["center",100]
+});
+$(".add_file").click(function(){
+	$('#dialog-file').dialog('open');
+	$('#dialog-file').load('{:U("file/add", "r=RBusinessFile&module=business&id=".$business["business_id"])}');
+});
+$(".add_log").click(function(){
+	$('#dialog-log').dialog('open');
+	$('#dialog-log').load('{:U("log/add", "r=RBusinessLog&module=business&id=".$business["business_id"])}');
+});
+$(".edit_log").click(function(){
+	$log_id = $(this).attr('rel');
+	$('#dialog-log-edit').dialog('open');
+	$('#dialog-log-edit').load('{:U("log/edit","id=")}'+$log_id);
+});
+$(".add_task").click(function(){
+	$('#dialog-task').dialog('open');
+	$('#dialog-task').load('{:U("task/add","r=RBusinessTask&module=business&id=".$business["business_id"])}');
+});
+$(".add_event").click(function(){
+	$('#dialog-event').dialog('open');
+	$('#dialog-event').load('{:U("event/add","r=RBusinessEvent&module=business&id=".$business["business_id"])}');
+});
+$(".add_product").click(function(){
+	$('#dialog-product').dialog('open');
+	$('#dialog-product').load('{:U("product/adddialog","r=RBusinessProduct&module=business&id=".$business["business_id"])}');
+});
+$(".edit_product").click(function(){
+	id = $(this).attr('rel');
+	$('#dialog-edit').dialog('open');
+	$('#dialog-edit').load('{:U("product/editdialog","r=RBusinessProduct&id")}'+id);
+});
+$(".role_info").click(function(){
+	$role_id = $(this).attr('rel');
+	$('#dialog-role-info').dialog('open');
+	$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+});
+$(".add_contract").click(function(){
+	$('#dialog-contract').dialog('open');
+	$('#dialog-contract').load('{:U("contract/add","business_id=")}'+{$business.business_id});
+});
+$(".advance").click(function(){
+	$('#dialog-advance').dialog('open');
+	$('#dialog-advance').load('{:U("business/advance","id=".$business["business_id"])}');
+});
+$(".more").click(function(){
+	log_id = $(this).attr('rel');
+	$('#llog_'+log_id).attr('class','');
+	$('#slog_'+log_id).attr('class','hide');
+});
+</script>
+<include file="Public:footer" />	

@@ -1,0 +1,101 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<select id="select1" name="cvid" onchange="changeContent()" class="select">
+			<optgroup label="预定义视图" class="st" style="border:none">
+				<option value="">所有线索</option>
+				<option <if condition="$Think.get.by eq 'me'">selected="selected"</if> value="?by=me">我的线索</option>
+				<option <if condition="$Think.get.by eq 'today'">selected="selected"</if> value="?by=today">今日线索</option>
+				<option <if condition="$Think.get.by eq 'week'">selected="selected"</if> value="?by=week">本周线索</option>
+				<option <if condition="$Think.get.by eq 'month'">selected="selected"</if> value="?by=month">本月线索</option>
+			</optgroup>
+			<optgroup label="最近的视图" style="border:none">
+				<option <if condition="$Think.get.by eq 'add'">selected="selected"</if> value="?by=add">最近创建的线索</option>
+				<option <if condition="$Think.get.by eq 'update'">selected="selected"</if> value="?by=update">最近修改的线索</option>
+			</optgroup>
+		</select>
+	</div>
+	<include file="Public:alert" />
+	<div class="row">
+		<form action="{:U('leads/delete')}" method="post">
+			<div class="span12">
+				<ul class="nav pull-left">
+					<li class="pull-left"><button id="delete" type="submit" class="btn">删除</button> &nbsp;</li>
+					<li class="dropdown pull-left">
+						<a href="#" class="btn dropdown-toggle" data-toggle="dropdown">更多动作<b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:void(0);" onclick="">更新字段</a></li>
+							<li><a href="javascript:void(0);" onclick="">创建任务</a></li>
+						</ul>
+					</li>
+				</ul>
+				<div class="pull-right">
+					<a href="{:U('Leads/add')}" class="btn btn-primary">新建线索</a>
+					<div class="btn-group hide">
+						<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown">线索工具 <span class="caret"></span></button>
+						<ul class="dropdown-menu">
+							<li><a href="javascript:void(0);" class="link" onclick="ajaxNew('/crm/MassRecords.do','module=Leads&amp;actiontype=mass_transfer&amp;lookback=showdetails')">批量转换线索</a></li>
+							<li><a href="javascript:void(0);" class="link" onclick="ajaxNew('/crm/MassRecords.do','module=Leads&amp;actiontype=mass_delete&amp;lookback=showdetails')">批量删除线索</a></li>
+							<li><a href="javascript:void(0);" class="link" onclick="ajaxNew('/crm/MassRecords.do','module=Leads&amp;actiontype=mass_update&amp;lookback=showdetails')">集中更新线索</a></li>
+							<li><a class="link" href="/crm/setupInner.do?page=lar.do?action=viewRules`seModule=Leads&amp;tab=auto&amp;in=rules">分配规则</a></li>
+							<li><a class="link" href="javascript:void(0);" onclick="ajaxNew('/crm/MassRecords.do','module=Leads&amp;actiontype=mass_email&amp;lookback=showdetails');">群发邮件给线索</a></li>
+							<li><a class="link" onclick="return window.confirm(&quot;您确定要导出线索吗 ?&quot;);" href="/crm/ExportEntity.do?module=Leads">导出线索</a></li>
+							<li><a href="javascript:void(0);" class="link" onclick="ajaxNew('/crm/WebLeadApproval.do')">审批线索</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+			<div class="span12">
+				<if condition="$leadslist eq null">
+					该视图没有线索数据！
+				<else/>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+							  <th><input type="checkbox" id="check_all"/> 全选</th>
+							  <th>线索名称</th>
+							  <th>公司</th>
+							  <th>电话</th>
+							  <th>邮箱</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<th colspan="5">{$page}</th>
+							</tr>
+						</tfoot>
+						<tbody>
+							<volist name="leadslist" id="vo">
+								<tr>
+									<td>
+										<input name="leads[]" class="check_list" type="checkbox" value="{$vo.leads_id}"/>
+										<a href="{:U('leads/view')}?id={$vo.leads_id}">查看</a>
+										<a href="{:U('leads/edit')}?id={$vo.leads_id}">编辑</a>
+									</td>
+									<td><a href="{:U('leads/view')}?id={$vo.leads_id}">{$vo.first_name}{$vo.last_name}</a></td>
+									<td>{$vo.company}</td>
+									<td>{$vo.phone}</td>
+									<td>{$vo.email}</td>
+								</tr>
+							</volist>
+						</tbody>
+					</table>
+				</if>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+function changeContent(){
+	a = $("#select1  option:selected").val();
+	window.location.href="{:U('leads/index')}"+a;
+}
+
+$(function(){
+	$("#check_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+});
+</script>
+<include file="Public:footer" />

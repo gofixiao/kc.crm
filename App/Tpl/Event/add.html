@@ -1,0 +1,262 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>添加日程</h4>
+	</div>
+	<div class="row">
+		<div class="span12">
+			<include file="Public:alert" />
+			<form action="{:U('event/add')}" method="post">
+			<input type="hidden" name="creator_id" value="{$Think.session.user_id}"/>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<td>&nbsp;</td>
+						<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp; <input class="btn" type="reset" onclick="javascript:history.go(-1)" value="返回"/></td>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr> 
+						<td>&nbsp;</td>
+						<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp; <input class="btn" type="reset" onclick="javascript:history.go(-1)" value="返回"/></td>
+					</tr>
+				</tfoot> 
+				<tbody>
+					<th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>基本信息</th>
+					<tr>						
+						<td class="tdleft" width="15%">*主题</td>
+						<td width="35%"><input type="text" name="subject" class="span3"/></td>
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td class="tdleft" width="15%">负责人</td>
+						<td width="35%"><input type="hidden" name="owner_role_id" value="{$Think.session.role_id}" id="owner_id"/><input type="text" id="owner_name" name="owner_name" value="{$Think.session.name}" class="span3"/></td>
+					</tr>
+					<tr>
+						<td class="tdleft">开始时间</td>
+						<td>
+							<input type="text" id="start_date" name="start_date" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:&quot;#F{$dp.$D('end_date')||'2020-10-01'}&quot;})" class="span3 Wdate"/>
+						</td>
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td class="tdleft">结束时间</td>
+						<td>
+							<input type="text" id="end_date" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:&quot;#F{$dp.$D(\'start_date\')}&quot;,maxDate:'2020-10-01'})" name="end_date" class="Wdate span3"/>
+						</td>
+					</tr>
+					<tr>
+						<td class="tdleft">地点</td>
+						<td><input type="text" id="venue" name="venue" class="span3"/></td>
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td class="tdleft">发送通知邮件</td>
+						<td><input name="send_email" type="radio" checked="true" value="1"/>是<input name="send_email" type="radio" value="0"/>否</td>
+					</tr>
+					<tr>
+						<td class="tdleft">选择相关：</td>
+						<td>
+							<select name="module" class="span2" onchange="changeContent()" id="select1">
+								<option value=""></option>
+								<option value="contacts">联系人</option>
+								<option value="leads">线索</option>
+								<option value="customer">客户</option>
+								<option value="business">商机</option>
+								<option value="product">产品</option>
+							</select>
+							<input type="hidden" id="module_id" name="module_id" id="select_content"/>
+							<input type="text" name="module_name" id="module_name"/>
+						</td>
+						<if condition="C('ismobile') neq 1"><td colspan="2">&nbsp;</td></if>
+						<!-- <td class="tdleft">是否重复日程</td>
+						<td><input name="recurring" type="radio" checked="true" value="1"/>是<input name="recurring" type="radio" value="0"/>否</td> -->
+					</tr>
+					<tr>
+						<td class="tdleft">描述</td>
+						<td <if condition="C('ismobile') neq 1">colspan="3"</if>>
+							<textarea rows="6" class="span6" name="description"></textarea>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+			</form>   
+		</div>
+	</div>
+</div>
+<div id="dialog-message" class="hide" title="选择任务所有者">loading...</div>	
+<div class="hide" id="dialog-message2" title="选择联系人">loading...</div>
+<div class="hide" id="dialog-message3" title="选择线索">loading...</div>
+<div class="hide" id="dialog-message4" title="选择客户">loading...</div>
+<div class="hide" id="dialog-message5" title="选择商机">loading...</div>
+<div class="hide" id="dialog-message6" title="选择产品">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+
+$("#dialog-message").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	minHeight: 400,
+    close: function () {
+        $(this).html(""); 
+    },
+    buttons: { 
+        "确认": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			if(item){
+				$('#owner_id').val(item);
+				$('#owner_name').val(name);
+			}
+            $(this).dialog("close"); 
+        },
+		"取消": function () {
+            $(this).dialog("close");
+        }
+    },
+	position:["center",100]
+});
+$("#dialog-message2").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	minHeight: 400,
+    close: function () {
+        $(this).html(""); 
+    },
+    buttons: { 
+        "确认": function () {
+			var item = $('input:radio[name="contacts"]:checked').val();
+			var name = $('input:radio[name="contacts"]:checked').parent().next().html();
+			$('#module_id').val(item);
+			$('#module_name').val(name);
+            $(this).dialog("close"); 
+        },
+		"取消": function () {
+            $(this).dialog("close");
+        }
+    },
+	position:["center",100]
+});
+$("#dialog-message3").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	minHeight: 400,
+    close: function () {
+        $(this).html(""); 
+    },
+    buttons: { 
+        "确认": function () {
+			var item = $('input:radio[name="leads"]:checked').val();
+			var name = $('input:radio[name="leads"]:checked').parent().next().html();
+			var company = $('input:radio[name="leads"]:checked').parent().next().next().html();
+			$('#module_id').val(item);
+			$('#module_name').val(name+" "+company);
+            $(this).dialog("close"); 
+        },
+		"取消": function () {
+            $(this).dialog("close");
+        }
+    },
+	position:["center",100]
+});
+$("#dialog-message4").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 600,
+    close: function () {
+        $(this).html(""); 
+    },
+    buttons: {
+        "确认": function () {
+			var item = $('input:radio[name="customer"]:checked').val();
+			var name = $('input:radio[name="customer"]:checked').parent().next().html();
+			$('#module_id').val(item);
+			$('#module_name').val(name);
+            $(this).dialog("close"); 
+        },
+		"取消": function () {
+            $(this).dialog("close");
+        }
+    },
+	position:["center",100]
+});
+$("#dialog-message5").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	minHeight: 400,
+    close: function () {
+        $(this).html(""); 
+    },
+    buttons: { 
+        "确认": function () {
+			var item = $('input:radio[name="business"]:checked').val();
+			var name = $('input:radio[name="business"]:checked').parent().next().html();
+			if(item){
+				$('#module_id').val(item);
+				$('#module_name').val(name);
+			}
+            $(this).dialog("close"); 
+        },
+		"取消": function () {
+            $(this).dialog("close");
+        }
+    },
+	position:["center",100]
+});
+$("#dialog-message6").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	minHeight: 400,
+    close: function () {
+        $(this).html(""); 
+    },
+    buttons: {
+        "确认": function () {
+			var item = $('input:radio[name="product_id"]:checked').val();
+			var name = $('input:radio[name="product_id"]:checked').parent().next().html();
+			$('#module_id').val(item);
+			$('#module_name').val(name);
+            $(this).dialog("close"); 
+        },
+		"取消": function () {
+            $(this).dialog("close");
+        }
+    },
+	position:["center",100]
+});
+function changeContent(){
+	$('#module_id').val("");
+	$('#module_name').val("");
+}
+
+$(function(){
+	$('#owner_name').click(
+		function(){
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load('{:U("user/listDialog")}');
+		}
+	);
+	$('#module_name').click(
+		function(){
+			a = $("#select1  option:selected").val();
+			if (a == "contacts"){
+				$('#dialog-message2').dialog('open');
+				$('#dialog-message2').load('{:U("contacts/radioListDialog")}');
+			}else if(a == "leads"){
+				$('#dialog-message3').dialog('open');
+				$('#dialog-message3').load('{:U("leads/listDialog")}');
+			}else if(a == "business"){
+				$('#dialog-message5').dialog('open');
+				$('#dialog-message5').load('{:U("business/listDialog")}');
+			}else if(a == "customer"){
+				$('#dialog-message4').dialog('open');
+				$('#dialog-message4').load('{:U("customer/listDialog")}');
+			}else if(a == "product"){
+				$('#dialog-message6').dialog('open');
+				$('#dialog-message6').load('{:U("product/allProductDialog")}');
+			}
+		}
+	);
+});
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,101 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>系统设置</h4>
+	</div>
+	<include file="Public:alert" />	
+	<div class="tabbable">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('setting/smtp')}">SMTP设置</a></li>
+			<li><a href="{:U('navigation/setting')}">系统菜单设置</a></li>
+			<li><a href="{:U('product/category')}">产品分类设置</a></li>
+			<li><a href="{:U('knowledge/category')}">知识分类设置</a></li>
+			<li><a href="{:U('setting/status')}">商机状态设置</a></li>
+			<li class="active"><a href="{:U('setting/statusflow')}">商机状态流设置</a></li>
+		</ul>
+	</div>
+	<div class="row">
+	<form id="form1" action="{:U('setting/statusflowDelete')}" method="post">
+		<div class="span12">
+			<p><div class="bulk-actions align-left">
+				<input type="submit" class="btn" value="删除"/>&nbsp; <a class="btn" id="set_default" href="javascript:void(0)"/>设为当前</a>
+				<div class="pull-right">
+					<a class="btn btn-primary" id="add">添加状态流</a>
+				</div>
+			</div></p>
+		</div>
+		<div class="span12">
+			<table class="table" width="95%" border="0" cellspacing="1" cellpadding="0">
+				<notempty name="flowList">
+				<thead>
+					<tr>
+						<th width="10%"><input type="checkbox" name="check_all" id="check_all" class="check_all"/> &nbsp;</th>
+						<th width="30%">状态流名</th>
+						<th width="40%">状态流描述</th>
+						<th width="20%">操作</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="6">
+							{$page}
+						</td>
+					</tr>
+				</tfoot>
+				<tbody>
+					<volist name="flowList" id="vo">
+						<tr>
+							<td><input type="checkbox" class="list" name="flow_id[]" value="{$vo.flow_id}"/>
+							</td>
+							<td>{$vo.name}</td>
+							<td>{$vo.description}</td>
+							<td><a class="edit" href="javascript:void(0)" rel="{$vo.flow_id}">编辑</a></td>
+						</tr>
+					</volist>
+				</tbody>
+				<else />
+					<tr>
+						<td>----暂无数据！----</td>
+					</tr>
+				</notempty>
+			</table>
+		</div> 
+	</form>
+	</div>
+</div>
+<div class="hide" id="dialog-add" title="添加状态流">loading...</div>
+<div class="hide" id="dialog-edit" title="修改状态流">loading...</div>
+<script type="text/javascript">	
+$("#dialog-add").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-edit").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(function(){
+	$("#check_all").click(function(){
+		$("input[class='list']").prop('checked', $(this).prop("checked"));
+	});
+	$("#add").click(function(){
+		$('#dialog-add').dialog('open');
+		$('#dialog-add').load('{:U("setting/statusflowadd")}');
+	});
+	$("#set_default").click(function(){
+		window.location="{:U('setting/use_flow','flow_id=')}"+id;
+	});
+	$(".edit").click(function(){
+		var id = $(this).attr('rel');
+		$('#dialog-edit').dialog('open');
+		$('#dialog-edit').load('{:U("setting/statusflowEdit","id")}'+id);
+	});
+})
+</script>
+<include file="Public:footer" />

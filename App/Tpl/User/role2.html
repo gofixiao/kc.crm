@@ -1,0 +1,200 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="page-header">
+			<h4>岗位</h4>
+		</div>
+		<include file="Public:alert" />
+		<p class="view"><b>视图：</b>
+			<a href="{:U('user/index','status=1')}" <if condition="ACTION_NAME eq 'index' and $Think.get.status neq '0'">class="active"</if>>员工列表</a> | 
+			<a href="{:U('user/index', 'status=0')}" <if condition="ACTION_NAME eq 'index' and $Think.get.status eq '0'">class="active"</if>>待激活员工</a> | 
+			<a href="{:U('user/department')}" <if condition="ACTION_NAME eq 'department'">class="active"</if>>部门列表</a> | 
+			<a href="{:U('user/role')}" <if condition="ACTION_NAME eq 'role'">class="active"</if>>岗位列表</a>			
+		</p>
+		<form action="{:U('user/role_delete')}" method="post">
+		<div class="row">
+			<div class="span12">
+				<div class="bulk-actions align-left">
+					<ul class="nav pull-left">					
+						<li class="dropdown">
+							<a href="#" class="btn dropdown-toggle" data-toggle="dropdown">按部门查看岗位<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:void(0);" class="link" onclick="window.location='{:U('user/role')}'">--全部--</a></li>
+								<volist name="departmentList" id="vo">
+									<li><a href="javascript:void(0);" class="link" onclick="window.location='{:U('user/role')}&department_id={$vo.department_id}'">{$vo.name}</a></li>
+								</volist>
+							</ul>
+						</li> 
+					</ul>
+					&nbsp; <input type="submit" class="btn" value="删除"/>
+					<div class="pull-right">
+						<a  class="btn btn-primary" href="{:U('user/add')}">添加员工</a>
+						&nbsp; <a id="add_department" class="btn btn-primary">添加部门</a>
+						&nbsp; <a id="add_role" class="btn btn-primary">添加岗位</a>
+					</div>
+				</div>
+			</div>
+			<div class="span12">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+						   <th><input class="check_all" id="check_all" type="checkbox" /></th>
+						   <th>岗位</th>
+						   <th>员工</th>
+						   <if condition="C('ismobile') neq 1"><th>描述</th></if>
+						   <th>操作</th>
+						</tr>
+					</thead>
+				 
+					<tbody>
+						<volist name="positionList" id="vo">
+						<tr>
+							<td><input type="checkbox" class="check_list" name="roleList[]" value="{$vo.position_id}"/></td>
+							<td >{$vo.department.name} - {$vo.name}</td>
+							<td>
+								<empty name="vo['user']">
+									<code>空缺</code>
+								<else />
+									<volist name="vo['user']" id="vo2">
+										{$vo2['user_name']}、&nbsp; 
+									</volist>
+								</empty>
+							</td>
+							<if condition="C('ismobile') neq 1"><td>{$vo['description']}</td></if>
+							<td>
+								<a rel="{$vo.position_id}" href="javascript:void(0);" class="edit">编辑</a>&nbsp;
+								<a rel="{$vo.position_id}" href="javascript:void(0);" class="permission">分配权限</a>
+							</td>
+						</tr>
+						</volist>
+					</tbody>
+				</table>
+			</div> <!-- End #tab1 -->
+		</div>
+		</form>
+	</div>
+	<div id="dialog-message2" class="hide" title="添加部门">loading...</div>	
+	<div id="dialog-message3" class="hide" title="添加岗位">loading...</div>	
+	<div id="dialog-authorize" class="hide" title="模块级权限设置">loading...</div>	
+	<div id="dialog-message5" class="hide" title="管理员工">loading...</div>	
+	<div id="dialog-message6" class="hide" title="修改岗位信息">loading...</div>	
+
+<script type="text/javascript">
+	<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=600;</if>
+	$('#dialog-message2').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight:400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#department_add').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});	
+	$('#dialog-message3').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight:400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#role_add').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});
+	$('#dialog-authorize').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight:400,
+		position :["center",100]
+	});
+	$('#dialog-message5').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight:400,
+		position :["center",100]
+	});
+	$('#dialog-message6').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight:400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#role_edit').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});
+	
+	$(function(){
+		$("#check_all").click(function(){
+			$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+		});
+		$("#add_department").click(function(){
+			$('#dialog-message2').dialog('open');$('#dialog-message2').load('{:U("user/department_add")}');
+		});
+		$("#add_role").click(function(){
+			$('#dialog-message3').dialog('open');$('#dialog-message3').load('{:U("user/role_add")}');
+		});
+		$(".user").click(function(){
+			$('#dialog-message5').dialog('open');
+			$id = $(this).attr('rel');
+			$('#dialog-message5').load('{:U("user/user_role_relation","by=role_user&role_id=")}'+$id);
+		});
+		$(".permission").click(function(){
+			$('#dialog-authorize').dialog('open');
+			id = $(this).attr('rel');
+			$('#dialog-authorize').load('{:U("permission/user_authorize","position_id=")}'+id);
+		});
+		$(".edit").click(function(){
+			$('#dialog-message6').dialog('open');
+			id = $(this).attr('rel');
+			$('#dialog-message6').load('{:U("user/role_edit","id=")}'+id);
+		});
+	});
+	function changeContent(){
+		a = $("#select1  option:selected").val();
+		if(a=='1'){
+			window.location.href="{:U('user/index')}";
+		}else if(a=='2'){
+			window.location.href="{:U('user/index', 'status=0')}";
+		}else if(a=='3'){
+			window.location.href="{:U('user/index', 'status=-1')}";
+		}else if(a=='4'){
+			window.location.href="{:U('user/department')}";
+		}else if(a=='5'){
+			window.location.href="{:U('user/role')}";
+		}
+	} 
+	
+	function deleteRole(id,name){
+		var v = confirm("确定删除岗位"+name+"吗?");
+		if(v == true){
+			window.location="{:U('User/role_delete','id=')}"+id;
+		}
+	}
+	function searchDepartment(){
+		var objCategory=document.getElementById("department");
+		var id=objCategory.options[objCategory.selectedIndex].value;
+		window.location="{:U('User/role','department_id=')}"+id;
+	}
+	
+</script>
+<include file="Public:footer" />	

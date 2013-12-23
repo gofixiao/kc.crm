@@ -1,0 +1,149 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>添加联系人</h4>
+	</div>
+	<div class="row">
+		<div class="span12">
+			<include file="Public:alert" />
+			<form action="{:U('contacts/add')}" method="post">
+				<input type="hidden" name="redirect" value="{$redirect}"/>
+				<input type="hidden" name="redirect_id" value="{$redirect_id}"/>  
+				<input type='hidden' name="r" <present name="r">value="{$r}"</present>/>
+				<input type='hidden' name="module" <present name="r">value="{$module}"</present>/> 
+				<input type='hidden' name="id" <present name="r">value="{$model_id}"</present>/> 
+				<table class="table" width="95%" border="0" cellspacing="1" cellpadding="0">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/>&nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp;<input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr> 
+							<td>&nbsp;</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/>&nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/> </td>				
+						</tr>
+					</tfoot>
+					<tbody>
+						<tr><th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>基本信息</th></tr>
+						<tr>
+							<td class="tdleft" width="15%">姓名</td>
+							<td width="35%" ><input class="text-input large-input" type="text" name="name" id="name"></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" width="15%">尊称</td>
+							<td width="35%" >
+								<select name="saltname" class="span2">
+									<option value="">-无-</option>
+									<option value="先生">先生</option>
+									<option value="女士">女士</option>
+									<option value="老师">老师</option>
+									<option value="医生">医生</option>
+									<option value="博士">博士</option>
+									<option value="教授">教授</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft" >负责人(单击选择)</td>
+							<td><input type="hidden" name="owner_role_id" id="owner_role_id" value="{$Think.session.role_id}"/><input type="text" name="owner_name" id="owner_name" value="{$Think.session.name}"/></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >所属客户(单击选择)</td>
+							<td><input type="hidden" name="customer_id" id="customer_id" value="{$customer['customer_id']}"/><input type="text" name="customer_name" id="customer_name"value="{$customer.name}"/></td>
+						</tr>
+						<tr>
+							<td class="tdleft" >职位</td>
+							<td>
+								<input class="text-input large-input"  type="text" name="post"/>
+							</td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >手机</td>
+							<td><input class="text-input large-input" name="telephone" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" >邮箱</td>
+							<td><input class="text-input large-input" name="email" type="text" /></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >QQ</td>
+							<td><input class="text-input large-input" name="qq" type="text" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" >联系地址</td>
+							<td><input class="text-input large-input" name="address" type="text"/></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >邮编</td>
+							<td><input class="text-input large-input" name="zip_code" type="text"/></td>
+						</tr>
+						<tr>
+							<td class="tdleft" >备注</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><textarea rows="6" class="span8" name="description" ></textarea></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>			
+		</div>
+	</div>
+</div>
+<div id="dialog-message" title="选择联系人所有人">loading...</div>
+<div id="dialog-message2" title="选择联系人所属客户">loading...</div>
+
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-message").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"确认": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			$('#owner_name').val(name);
+			$('#owner_role_id').val(item);
+			$(this).dialog("close");
+		},
+		"取消": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$("#dialog-message2").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"确认": function () {
+			var item = $('input:radio[name="customer"]:checked').val();
+			var name = $('input:radio[name="customer"]:checked').parent().next().html();
+			if(item){
+				$('#customer_name').val(name);
+				$('#customer_id').val(item);
+			}
+			$(this).dialog("close");
+		},
+		"取消": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+
+$(function(){
+	$("#owner_name").click(
+		function(){
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load('{:U("user/listDialog")}');
+		}
+	);
+	$("#customer_name").click(
+		function(){
+			$('#dialog-message2').dialog('open');
+			$('#dialog-message2').load('{:U("customer/listDialog")}');
+		}
+	);
+	
+});
+</script>
+<include file="Public:footer" />

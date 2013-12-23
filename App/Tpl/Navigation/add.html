@@ -1,0 +1,30 @@
+<form class="form-horizontal" action="{:U('navigation/add')}" method="post" >
+	<div class="control-group">
+		<label class="control-label" for="name">菜单名</label>
+		<div class="controls">
+			<input type="text" id="title" name="title"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="name">导航位置</label>
+		<div class="controls">
+			<select name="postion">
+				<option value="top">顶部</option>
+				<option value="more">更多</option>
+				<option value="user" >系统</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="name">链接地址</label>
+		<div class="controls">
+			<input type="text" id="name" name="url"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="name"></label>
+		<div class="controls">
+			<input class="btn btn-primary" type="submit" value="提交"/>
+		</div>
+	</div>
+</form>

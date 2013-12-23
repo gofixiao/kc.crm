@@ -1,0 +1,17 @@
+<form action="{:U(event/excelImport)}" method="post" enctype="multipart/form-data">
+	<table class="table table-hover">
+		<tr>
+			<td class="tdleft">选择文件:</td> 
+			<td>(文件总大小不能超过20MB)</td>
+		</tr>
+		<tr>
+			<td class="tdleft">附件</td>
+			<td><p>允许类型：'xls'</p>
+			<p id="attachment1"><input type="file" name="excel"/></p></td>
+		</tr>		
+		<tr> 
+			<td>&nbsp;</td>
+			<td><input class="btn btn-primary" type="submit" name="submit" value="导入"/> &nbsp; <input class="btn" onclick="javascript:$('#dialog-import').dialog('close');" type="button" value="取消"/></td>
+		</tr>
+	</table>
+</form>

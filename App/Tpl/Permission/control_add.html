@@ -1,0 +1,42 @@
+<form class="form-horizontal" action="control_add" method="Post">
+	<div class="control-group">
+		<label class="control-label">操作名</label>
+		<div class="controls">
+			<input type="text" name="name"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">模块名</label>
+		<div class="controls">
+			<select name="module_id">
+				<volist name="moduleList" id="vo">
+					<option <if condition="$_GET['module_id'] eq $vo['module_id']"> selected </if> value="{$vo.module_id}">{$vo.name}</option>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">URL</label>
+		<div class="controls">
+			<input name="url" type="text"/>形如：User/edit
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">参数</label>
+		<div class="controls">
+			<input name="parameter" type="text"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">描述</label>
+		<div class="controls">
+			<textarea name="description"></textarea>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label"></label>
+		<div class="controls">
+			<input class="btn btn-primary" type="submit" value=" 添 加 "/>
+		</div>
+	</div>
+</form>

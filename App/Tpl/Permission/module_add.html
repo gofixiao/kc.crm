@@ -1,0 +1,21 @@
+
+<form class="form-horizontal" action="{:U('permission/module_add')}" method="Post">
+	<div class="control-group">
+		<label class="control-label" for="name">模块名</label>
+		<div class="controls">
+			<input type="text" id="name" name="name"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="description">模块描述</label>
+		<div class="controls">
+			<textarea name="description" id="description"></textarea> 
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">&nbsp;</label>
+		<div class="controls">
+			<input class="btn" type="submit" name="submit" value=" 保存 "> <input name="submit" class="btn" type="submit" value=" 取消 ">
+		</div>
+	</div>
+</form>

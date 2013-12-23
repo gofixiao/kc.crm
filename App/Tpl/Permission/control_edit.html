@@ -1,0 +1,43 @@
+<form class="form-horizontal" action="{:U('permission/control_edit')}" method="Post">
+	<input type="hidden" name="control_id" value="{$vo.control_id}"/>
+	<div class="control-group">
+		<label class="control-label" for="inputEmail">操作名</label>
+		<div class="controls">
+			<input  type="text" name="name" value="{$vo.name}"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="inputEmail">模块名</label>
+		<div class="controls">
+			<select name="module_id">
+				<volist name="moduleList" id="temp">
+					<option <if condition="$temp.module_id eq $vo['module_id']">selected</if> value="{$temp.module_id}">{$temp.name}</option>
+				</volist>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="inputEmail">URL</label>
+		<div class="controls">
+			<input name="url" type="text" value="{$vo.m}/{$vo.a}"/>形如：User/edit
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="inputEmail">参数</label>
+		<div class="controls">
+			<input name="parameter" type="text" value="{$vo.parameter}"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="inputEmail">描述</label>
+		<div class="controls">
+			<textarea name="description">{$vo.description}</textarea>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="inputEmail"></label>
+		<div class="controls">
+			<input class="btn" type="submit" value=" 修 改 ">
+		</div>
+	</div>
+</form>

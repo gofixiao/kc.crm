@@ -1,0 +1,110 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<select id="select1" onchange="changeContent()">
+			<option>--选择查看内容--</option>
+			<option value="1">权限管理</option>
+			<option value="2">权限模块管理</option>
+		</select>
+		<div class="pull-right">
+			<a id="add_control" class="btn btn-primary" href="javascript:void(0)">添加操作</a>
+			&nbsp; <a id="add_module" class="btn btn-primary" href="javascript:void(0)">添加模块</a>
+		</div>
+	</div>
+	<include file="Public:alert" />	
+	<div class="row">
+		<div class="span12">
+			<form action="{:U('permission/module_delete')}" method="POST"/>
+			<table class="table table-hover">
+				<thead>
+					<tr>
+					   <th><input type="checkbox" name="check_all"/> <input class="btn" type="submit" value="删除所选"/></th>
+					   <th>模块名</th>
+					   <th>模块描述</th>
+					   <th>&nbsp;</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<th colspan="4">{$page}</th>
+					</tr>
+				</tfoot>
+				<tbody>
+					<volist name="moduleList" id="vo">  
+					<tr>
+						<td width="200">
+							<input type="checkbox" class="control_list" name="module_list[]" value="{$vo.module_id}"/>
+							<a rel="{$vo.module_id}" class="edit_module" href="javascript:void(0)">编辑</a>
+						</td>
+						<td>{$vo.name}</td>
+						<td>{$vo.description}</td>
+					</tr>
+					</volist>
+				</tbody>
+			</table> 
+			</form>
+		</div>
+	</div>
+</div>
+<div id="dialog2" class="hide" title="添加操作">loading...</div>	
+<div id="dialog3" class="hide" title="编辑操作模块">loading...</div>	
+<div id="dialog4" class="hide" title="添加模块">loading...</div>	
+<script type="text/javascript">
+$("#dialog2").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600, 
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+
+$("#dialog3").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+$("#dialog4").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+function changeContent(){
+	a = $("#select1  option:selected").val();
+	if(a=='1'){
+		window.location.href="{:U('permission/index')}";
+	}else if(a=='2'){
+		window.location.href="{:U('permission/module')}";
+	}
+} 
+
+function deleteModule(id,name){
+	var v = confirm("确定删除岗位"+name+"吗?");
+	if(v == true){
+		window.location="{:U('permission/module_delete','id=')}"+id;
+	}
+}
+$(function(){
+	$("#control_all").click(function(){
+		$("input[class='control_list']").prop('checked', $(this).prop("checked"));
+	});
+	$("#add_control").click(function(){
+		$('#dialog2').dialog('open');$('#dialog2').load('{:U('permission/control_add')}');
+	});
+	$("#add_module").click(function(){
+		$('#dialog4').dialog('open');$('#dialog4').load('{:U('permission/module_add')}');
+	});
+	$(".edit_module").click(function(){
+		id = $(this).attr('rel');
+		$('#dialog3').dialog('open');$('#dialog3').load('{:U("permission/module_edit","id=")}'+id);
+	});
+})
+</script>
+
+<include file="Public:footer" />	

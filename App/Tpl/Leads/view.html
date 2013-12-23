@@ -1,0 +1,420 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4><a name="tab">线索详情</a></h4>
+	</div>
+	<include file="Public:alert"/>
+	<div class="row">		
+		<div class="tabbable span12">
+			<ul class="nav nav-tabs">
+				<li><a href="#tab1">基本信息</a></li>
+				<li><a href="#tab6">负责人日志({$leads['record_count']})</a></li>
+				<li><a href="#tab2">沟通日志({$leads['log_count']})</a></li>
+				<li><a href="#tab4">任务({$leads['task_count']})</a></li>
+				<li><a href="#tab5">日程({$leads['event_count']})</a></li>
+				<li><a href="#tab3">文件({$leads['file_count']})</a></li>
+			</ul>
+			<div class="tab-content">
+					<table class="table" border="0" cellspacing="1" cellpadding="0">
+						<thead>
+							<tr>
+								<td <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>
+									<p style="font-size: 14px;">
+										<if condition="$leads['is_deleted'] == 0">
+											<a href="javascript:void(0);" class="add_log">添加沟通日志</a> |
+											<a href="javascript:void(0);" class="add_task">添加任务</a> |
+											<a href="javascript:void(0);" class="add_event">添加日程</a>&nbsp;|
+											<a href="javascript:void(0);" class="add_file">添加文件</a>&nbsp;|
+											<if condition="$leads['is_transformed'] neq 1"><a target="_blank" href="{:U('customer/add','leads_id='.$leads['leads_id'])}">转换为客户</a>&nbsp;|</if>
+											<a href="{:U('leads/edit','id='.$leads['leads_id'])}">编辑</a>&nbsp;|
+											<a href="{:U('leads/delete','id='.$leads['leads_id'])}">删除</a>&nbsp;|
+											<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+										<else />
+											<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+										</if>
+									</p>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+									<td class="tdleft" width="15%">创建时间</td>
+									<td><if condition="$leads['create_time'] neq 0">{$leads.create_time|date='Y-m-d H:i:s',###}</if></td>
+								</tr>
+                                <tr>
+									<td class="tdleft">创建人</td>
+									<td><a class="role_info" href="javascript:void(0)" rel="{$leads.creator.role_id}">{$leads.creator.user_name}</if></a></td>
+								</tr>
+                                <tr>
+									<td class="tdleft">负责人</td>
+									<td><a class="role_info" href="javascript:void(0)" rel="{$leads.owner.role_id}">{$leads.owner.user_name}</if></a></td>
+								</tr>
+                                <tr>
+									<td class="tdleft" width="15%">最后修改时间</td>
+									<td><if condition="$leads['update_time'] gt 0">{$leads.update_time|date='Y-m-d H:i:s',###}</if></td>
+								</tr>
+								<volist name="field_list" id="vo">
+                                    <tr><td class="tdleft">{$vo[name]}</td>
+                                    <td>
+                                        <span style="color:#{$vo['color']}">
+                                        <if condition="$vo['form_type'] eq 'datetime'">
+											<if condition="$leads[$vo['field']] gt 0">{$leads[$vo['field']]|date='Y-m-d',###}</if>
+                                        <else />
+											{$leads[$vo['field']]}
+                                        </if>
+                                        </span>
+                                    </td>
+                                    </tr>
+                                </volist>
+						</tbody>
+					</table>
+                    <a name="tab6"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>负责人日志</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$leads.record eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td>负责人</td>
+								<td>领取时间</td>
+							</tr>
+							<volist name="leads.record" id="vo">
+								<tr>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										{$vo.start_time|date="Y-m-d",###}
+									</td>
+								</tr>
+							</volist>
+						</if>
+					</table>
+                    <a name="tab2"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>沟通日志</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$leads.log eq null">
+							<tr>
+								<td>没有数据</td>
+							</tr>
+						<else />
+							<volist name="leads.log" id="vo">
+								<tr>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty> &nbsp; 
+										{$vo.create_date|date="Y-m-d  g:i a",###} &nbsp; 
+										<notempty name="vo.create_date"> &nbsp; </notempty>
+										<if condition="C('ismobile') eq 1"><br/></if>
+										{$vo.subject}
+									</td>
+									<td>
+										<if condition="$leads['is_deleted'] neq 1"><a href="javascript:void(0)" rel="{$vo.log_id}" class="edit_log">编辑</a>&nbsp;<a href="{:U('log/delete','r=RLeadsLog&id='.$vo['log_id'])}">删除</a></if>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<if condition="strlen($vo['content']) gt 100">
+											<div id="slog_{$vo.log_id}">
+											<pre>{$vo.content|msubstr=###,0,100}
+											<a class="more" rel="{$vo.log_id}" href="javascript:void(0)">查看全文</a></pre>
+											</div>
+											<div id="llog_{$vo.log_id}" class="hide">
+												<pre>{$vo.content}</pre>
+											</div>
+										<else/>
+											<pre>{$vo.content}</pre>
+										</if>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$leads['is_deleted'] neq 1">
+							<tr>
+								<td colspan="2">
+									<a href="javascript:void(0);" class="add_log">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab4"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关任务</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$leads.task eq null">
+							<tr>
+								<td>没有数据</td>
+							</tr>
+						<else /> 
+							<tr>
+								<td  width="12%">&nbsp;</td>
+								<td>主题</td>
+								<if condition="C('ismobile') neq 1"><td>状态</td></if>
+								<td>执行人</td>
+								<td>到期日期</td>
+								<if condition="C('ismobile') neq 1"><td>修改时间</td></if>
+							</tr>
+							<volist name="leads.task" id="vo">
+								<tr>
+									<td class="tdleft">
+										<if condition="$leads['is_deleted'] == 0"><a href="{:U('task/view','id='.$vo['task_id'])}">查看</a>&nbsp; <a href="{:U('task/delete','id='.$vo['task_id'])}">删除</a>
+										<if condition="$vo.isclose eq 1"><a href="{:U('task/close','id='.$vo['task_id'])}">关闭</a><else />已关闭</if></if>
+									</td>
+									<td>
+										<a href="{:U('task/view','id='.$vo['task_id'])}">{$vo.subject}</a>
+									</td>
+									<if condition="C('ismobile') neq 1">
+									<td>
+										{$vo.status}
+									</td>
+									</if>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										<notempty name="vo.due_date">{$vo.due_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									<if condition="C('ismobile') neq 1">
+									<td>
+										<notempty name="vo.update_date">{$vo.update_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									</if>
+								</tr>
+							</volist>
+						</if>
+						<tr>
+							<td <if condition="C('ismobile') neq 1">colspan="6"<else />colspan="4"</if>>
+								<if condition="$leads['is_deleted'] == 0"><a href="javascript:void(0);" class="add_task">添加</a></if>
+							</td>
+						</tr>
+					</table>
+                    <a name="tab5"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关日程</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$leads.event eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td width="12%">&nbsp;</td>
+								<td>主题</td>
+								<td>地点</td>
+								<td>负责人</td>
+								<if condition="C('ismobile') neq 1"><td>开始时间</td>
+								<td>结束时间</td></if>
+							</tr>
+							<volist name="leads.event" id="vo">
+								<tr>
+									<td class="tdleft" >
+										<if condition="$leads['is_deleted'] == 0"><a href="{:U('event/view','id='.$vo['event_id'])}">查看</a>&nbsp; <a href="{:U('event/delete','id='.$vo['event_id'])}">删除</a>&nbsp; 
+										<if condition="$vo.isclose eq 1"><a href="{:U('event/close','id='.$vo['event_id'])}">关闭</a><else />已关闭</if></if>
+									</td>
+									<td>
+										{$vo.subject}
+									</td>
+									<td>
+										{$vo.venue}
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<if condition="C('ismobile') neq 1">
+									<td>
+										<notempty name="vo.start_date">{$vo.start_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									<td>
+										<notempty name="vo.end_date">{$vo.end_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									</if>
+								</tr>
+							</volist>
+						</if>
+						<tr>
+							<td <if condition="C('ismobile') neq 1">colspan="6"<else />colspan="4"</if>>
+								<if condition="$leads['is_deleted'] == 0"><a href="javascript:void(0);" class="add_event">添加</a></if>
+							</td>
+						</tr>
+					</table>
+                    <a name="tab3"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关文件</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$leads.file eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td>&nbsp;</td>
+								<td>文件名</td>
+								<td>大小</td>
+								<if condition="C('ismobile') neq 1"><td>添加者</td>
+								<td>添加时间</td></if>
+							</tr>
+							<volist name="leads.file" id="vo">
+								<tr>
+									<td class="tdleft"><if condition="$leads['is_deleted'] == 0"><a href="{:U('file/delete','r=RFileLeads&id='.$vo['file_id'])}">删除</a></if></td>
+									<td>
+										<a target="_blank" href="{$vo.file_path}">{$vo.name}</a>
+									</td>
+									<td>
+										{$vo.size}字节
+									</td>
+									<if condition="C('ismobile') neq 1">
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									</if>
+								</tr>
+							</volist>
+						</if>
+						<tr>
+							<td <if condition="C('ismobile') neq 1">colspan="5"<else />colspan="3"</if>>
+								<if condition="$leads['is_deleted'] == 0"><a href="javascript:void(0);" class="add_file">添加</a></if>
+							</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-file" title="添加附件">loading...</div>
+<div class="hide" id="dialog-log" title="添加日志">loading...</div>
+<div class="hide" id="dialog-log-edit" title="编辑日志">loading...</div>
+<div class="hide" id="dialog-task" title="添加任务">loading...</div>
+<div class="hide" id="dialog-event" title="添加日程">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+
+$("#dialog-file").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log-edit").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-task").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-event").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(".edit_log").click(function(){
+	$log_id = $(this).attr('rel');
+	$('#dialog-log-edit').dialog('open');
+	$('#dialog-log-edit').load('{:U("log/edit","id=")}'+$log_id);
+});
+$("#dialog-role-list").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			$('#owner_name').val(name);
+			$('#owner_id').val(item);
+			$(this).dialog("close"); 
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+
+$(".add_file").click(function(){
+	$('#dialog-file').dialog('open');
+	$('#dialog-file').load('{:U("file/add","r=RFileLeads&module=leads&id=".$leads["leads_id"])}');
+});
+$(".add_log").click(function(){
+	$('#dialog-log').dialog('open');
+	$('#dialog-log').load('{:U("log/add","r=RLeadsLog&module=leads&id=".$leads["leads_id"])}');
+});
+$(".add_task").click(function(){
+	$('#dialog-task').dialog('open');
+	$('#dialog-task').load('{:U("task/add","r=RLeadsTask&module=leads&id=".$leads["leads_id"])}');
+});
+$(".add_event").click(function(){
+	$('#dialog-event').dialog('open');
+	$('#dialog-event').load('{:U("event/add","r=REventLeads&module=leads&id=".$leads["leads_id"])}');
+});
+$(function(){
+	$('#owner_name').click(
+		function(){
+			$('#dialog-role-list').dialog('open');
+			$('#dialog-role-list').load("{:U('user/listDialog')}");
+		}
+	);
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	$(".more").click(function(){
+		log_id = $(this).attr('rel');
+		$('#llog_'+log_id).attr('class','');
+		$('#slog_'+log_id).attr('class','hide');
+	});
+});
+</script>
+<include file="Public:footer" />

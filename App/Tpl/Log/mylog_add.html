@@ -1,0 +1,64 @@
+<include file="Public:header" />
+<script type="text/javascript" src="__PUBLIC__/js/kindeditor-all-min.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/zh_CN.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/kindeditor.css" type="text/css" />
+<script type="text/javascript">
+	<if condition="C('ismobile') neq 1">
+		var editor;
+		KindEditor.ready(function(K) {
+			editor = K.create('textarea[name="content"]', {
+				uploadJson:'{:U("file/editor")}',
+				allowFileManager : true,
+				loadStyleMode : false
+			});
+		});
+	</if>
+</script>
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<h3>写日志</h3>
+	</div>	
+	<div class="row">
+		<div class="span12">
+			<include file="Public:alert" />
+			<form action="{:U('log/mylog_add')}" method="post">
+				<input type="hidden" name="creator_id" value="{$Think.session.user_id}"/>
+				<table class="table" width="95%" border="0" cellspacing="1" cellpadding="0">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/>&nbsp; <input class="btn btn-primary" name="submit" type="submit" value="保存并新建"/> &nbsp;<input class="btn btn-primary" type="reset" value="取消"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr> 
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/>&nbsp; <input class="btn btn-primary" type="reset" value="取消"/></td>					
+						</tr>
+					</tfoot>
+					<tbody width="100%">
+						<tr>
+							<th colspan="2">基本信息</th>
+						</tr>
+						<tr>
+							<td class="tdleft" width="15%">标题</td>
+							<td><input type="text" class="span5" name="subject" maxlength="20" value="{$current_time|date="Y-m-d",###} 工作日志"></td>						
+						</tr>
+						<tr>
+							<td width="20%" class="tdleft">日志类型</td>
+							<td><input type="radio" name="category_id" value="4" checked> 日报 &nbsp;  &nbsp; <input type="radio" name="category_id" value="3"> 周报 &nbsp;  &nbsp; <input type="radio" name="category_id" value="2"> 月报</td>
+						</tr>
+						<tr>
+							<td class="tdleft" >内容</td>
+							<td width="75%" colspan="3" >
+								<textarea rows="15" class="span6" name="content" style="width: 800px; height: 350px;"></textarea> 
+							</td>							
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+<include file="Public:footer" />

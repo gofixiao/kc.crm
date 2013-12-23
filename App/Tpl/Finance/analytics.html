@@ -1,0 +1,405 @@
+<include file="Public:header" />
+<script src="__PUBLIC__/js/chart/highcharts.js"></script>
+<script src="__PUBLIC__/js/chart/modules/exporting.js"></script>
+
+<div class="container">
+	<div class="page-header" style="border:none; font-size:14px;">
+		<ul class="nav nav-tabs">
+		  <li><a  href="{:U('finance/index','t=receivables')}"><img src="__PUBLIC__/img/task_checked2.png"/>&nbsp; 应收款</a></li>
+		  <li><a href="{:U('finance/index','t=payables')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp; 应付款</a></li>
+		  <li><a href="{:U('finance/index','t=receivingorder')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp; 收款单</a></li>
+		  <li><a href="{:U('finance/index','t=paymentorder')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp; 付款单</a></li>
+		  <li class="active"><a href="{:U('finance/analytics')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp; 财务统计</a></li>
+		</ul>
+	</div>
+	<include file="Public:alert" />
+	<div class="row">
+		<div class="span12">
+			<ul class="nav pull-left">
+				<li class="pull-left">
+					<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="" method="get">
+						<ul class="nav pull-left">
+							<li class="pull-left">
+								选择部门：&nbsp; <select style="width:auto" name="department" id="department" onchange="changeRole()">
+									<option class="all" value="all">全部</option>
+									<volist name="departmentList" id="vo">
+										<option value="{$vo.department_id}">{$vo.name}</option>
+									</volist>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li class="pull-left">
+								选择员工：&nbsp; <select style="width:auto" name="role" id="role" onchange="changeCondition()">
+									<option class="all" value="all">全部</option>
+									<volist name="roleList" id="vo">
+										<option value="{$vo.role_id}">{$vo.role_name}-{$vo.user_name}</option>
+									</volist>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li class="pull-left">
+								选择日期：&nbsp; 从<input type="text" id="start_time" name="start_time" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" value="{$Think.get.start_time}"/>至<input type="text" id="end_time" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="end_time" class="Wdate" value="{$Think.get.end_time}" />&nbsp;&nbsp;
+							</li>
+							<li class="pull-left"><input type="hidden" name="m" value="finance"/><input type="hidden" name="a" value="analytics"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<button type="submit" class="btn">搜索</button></li>
+						</ul>
+					</form>
+				</li>				
+			</ul>
+		</div>
+		<div class="span2 knowledgecate">
+			<ul class="nav nav-list">
+				<li class="active">
+					<a href="javascript:void(0);">选择统计内容</a>
+				</li>
+				<li id="report"><a id="show_report" class="active" href="javascript:void(0)"><i class="icon-white icon-chevron-right"></i>财务统计报表</a></li>
+				<li id="moon"><a id="show_moon" href="javascript:void(0)"><i class="icon-white icon-chevron-right"></i>月度统计</a></li>
+				<li id="shoukuan"><a id="show_shoukuan" href="javascript:void(0)"><i class="icon-white icon-chevron-right"></i>应收款年度同比</a></li>
+				<li id="fukuan"><a id="show_fukuan" href="javascript:void(0)"><i class="icon-white icon-chevron-right"></i>应付款年度同比</a></li>
+			</ul> 
+		</div>
+		<div class="span10">
+			<div class="span10" id="report_content">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>员工</th>
+							<th>应收款数</th>
+							<th>未收款</th>
+							<th>部分收款</th>
+							<th>应收金额</th>
+							<th>实际收款金额</th>
+							<th>收款单</th>
+							<th>应付款数</th>
+							<th>未付款</th>
+							<th>部分付款</th>
+							<th>应付金额</th>
+							<th>实际付款金额</th>
+							<th>付款单</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr style="background:yellow">
+							<td style="text-align:right">共计:</td>
+							<td>{$total_report.shoukuan_count}</td>
+							<td>{$total_report.weishou_count}</td>
+							<td>{$total_report.bufenshoukuan_count}</td>
+							<td>{$total_report.shoukuan_money}</td>
+							<td>{$total_report.yishou_money}</td>
+							<td>{$total_report.shoukuandan_count}</td>
+							<td>{$total_report.fukuan_count}</td>
+							<td>{$total_report.weifu_count}</td>
+							<td>{$total_report.bufenfukuan_count}</td>
+							<td>{$total_report.fukuan_money}</td>
+							<td>{$total_report.yifu_money}</td>
+							<td>{$total_report.fukuandan_count}</td>
+						</tr>
+						<volist name="reportList" id="vo">
+						<tr>
+							<td class="tdleft"><a class="role_info" rel="{$vo.user.role_id}" href="javascript:void(0)">{$vo.user.user_name}</a></td>
+							<td>{$vo.shoukuan_count}</td> 
+							<td>{$vo.weishou_count}</td>
+							<td>{$vo.bufenfukuan_count}</td>
+							<td>{$vo.shoukuan_money}</td>
+							<td>{$vo.yishou_money}</td>
+							<td>{$vo.shoukuandan_count}</td>
+							
+							<td>{$vo.fukuan_count}</td>
+							<td>{$vo.weifu_count}</td>
+							<td>{$vo.bufenfukuan_count}</td> 
+							<td>{$vo.fukuan_money}</td>
+							<td>{$vo.yifu_money}</td>
+							<td>{$vo.fukuan_count}</td>
+						</tr>
+
+						</volist>
+					</tbody>
+				</table>
+			</div>
+			
+			<div id="moon_content" class="span10 hidden">
+				<div id="an_chart" class="span10">
+					<div id="canvas_moon" style="min-width: 800px; height: 500px; margin: 0 auto"></div>
+				</div>
+			</div>
+			<div id="shoukuan_year_content" class="hidden span10">
+				<div id="an_chart" class="span10">
+					<div id="canvas_shoukuan" style="min-width: 800px; height: 500px; margin: 0 auto"></div>
+				</div>
+			</div>
+			<div id="fukuan_year_content" class="hidden span10">
+				<div id="an_chart" class="span10">
+					<div id="canvas_fukuan" style="min-width: 800px; height: 500px; margin: 0 auto"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+	<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+	$("#dialog-role-info").dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		position: ["center",100]
+	});
+	
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	
+	$(function () {
+		$('#canvas_moon').highcharts({
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: '财务信息月度统计'
+			},
+			xAxis: {
+				categories: [
+					'Jan',
+					'Feb',
+					'Mar',
+					'Apr',
+					'May',
+					'Jun',
+					'Jul',
+					'Aug',
+					'Sep',
+					'Oct',
+					'Nov',
+					'Dec'
+				]
+			},
+			yAxis: {
+				min: 0,
+				title: {
+					text: '财务信息月度统计'
+				}
+			},
+			tooltip: {
+				headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+					'<td style="padding:0"><b>{point.y:.1f} 元</b></td></tr>',
+				footerFormat: '</table>',
+				shared: true,
+				useHTML: true
+			},
+			plotOptions: {
+				column: {
+					pointPadding: 0.2,
+					borderWidth: 0
+				}
+			},
+			series: [{
+				name: '应收款',
+				data: {$moon_count['shoukuan']}
+	
+			}, {
+				name: '实际收款',
+				data: {$moon_count['shijishoukuan']}
+	
+			}, {
+				name: '应付款',
+				data: {$moon_count['fukuan']}
+	
+			}, {
+				name: '实际付款',
+				data: {$moon_count['shijifukuan']}
+	
+			}]
+		});
+		
+		$('#canvas_shoukuan').highcharts({
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: '应收款年度同比'
+			},
+			xAxis: {
+				categories: [
+					'Jan',
+					'Feb',
+					'Mar',
+					'Apr',
+					'May',
+					'Jun',
+					'Jul',
+					'Aug',
+					'Sep',
+					'Oct',
+					'Nov',
+					'Dec'
+				]
+			},
+			yAxis: {
+				min: 0,
+				title: {
+					text: '应收款年度同比'
+				}
+			},
+			tooltip: {
+				headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+					'<td style="padding:0"><b>{point.y:.1f} 元</b></td></tr>',
+				footerFormat: '</table>',
+				shared: true,
+				useHTML: true
+			},
+			plotOptions: {
+				column: {
+					pointPadding: 0.2,
+					borderWidth: 0
+				}
+			},
+			series: [{
+				name: '去年',
+				data: {$year_count['shoukuan_previousyear']}
+	
+			}, {
+				name: '今年',
+				data: {$year_count['shoukuan_thisyear']}
+	
+			}]
+		});
+		
+		$('#canvas_fukuan').highcharts({
+			chart: {
+				type: 'column'
+			},
+			title: {
+				text: '应付款年度同比'
+			},
+			xAxis: {
+				categories: [
+					'Jan',
+					'Feb',
+					'Mar',
+					'Apr',
+					'May',
+					'Jun',
+					'Jul',
+					'Aug',
+					'Sep',
+					'Oct',
+					'Nov',
+					'Dec'
+				]
+			},
+			yAxis: {
+				min: 0,
+				title: {
+					text: '应付款年度同比'
+				}
+			},
+			tooltip: {
+				headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+				pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+					'<td style="padding:0"><b>{point.y:.1f} 元</b></td></tr>',
+				footerFormat: '</table>',
+				shared: true,
+				useHTML: true
+			},
+			plotOptions: {
+				column: {
+					pointPadding: 0.2,
+					borderWidth: 0
+				}
+			},
+			series: [{
+				name: '去年',
+				data: {$year_count['fukuan_previousyear']}
+	
+			}, {
+				name: '今年',
+				data: {$year_count['fukuan_thisyear']}
+	
+			}]
+		});
+	});
+	
+	
+	
+	function changeRole(){
+		department_id = $("#department option:selected").val();
+		$.ajax({
+			type:'get',
+			url:'index.php?m=user&a=getrolebydepartment&department_id='+department_id,
+			async:true,
+			success:function(data){
+				options = '<option value="all">全部</option>';
+				if(data.data != null){
+					$.each(data.data, function(k, v){
+						options += '<option value="'+v.role_id+'">'+v.role_name+"-"+v.user_name+'</option>';
+					});
+				}
+				$("#role").html(options);
+				<if condition="$_GET['role']">
+				$("#role option[value='{$Think.get.role}']").prop("selected", true);
+				</if>
+			},
+			dataType:'json'});
+	}
+	
+	<if condition="$_GET['department'] and $_GET['department'] neq 'all'">
+	$("#department option[value='{$Think.get.department}']").prop("selected", true); 
+	changeRole();
+	</if>
+	<if condition="$_GET['department'] eq 'all'">
+	$("#role option[value='{$Think.get.role}']").prop("selected", true);
+	</if>
+	
+	$(function(){
+		$("#show_report").click(function(){
+			$(this).addClass('active');
+			$("#show_moon").removeClass('active');
+			$("#show_shoukuan").removeClass('active');
+			$("#show_fukuan").removeClass('active');
+			
+			$("#report_content").removeClass('hidden');
+			$("#moon_content").addClass('hidden');
+			$("#shoukuan_year_content").addClass('hidden');
+			$("#fukuan_year_content").addClass('hidden');
+		});
+		$("#show_moon").click(function(){
+			$(this).addClass('active');
+			$("#show_report").removeClass('active');
+			$("#show_shoukuan").removeClass('active');
+			$("#show_fukuan").removeClass('active');
+			
+			$("#report_content").addClass('hidden');
+			$("#moon_content").removeClass('hidden');
+			$("#shoukuan_year_content").addClass('hidden');
+			$("#fukuan_year_content").addClass('hidden');
+		});
+		$("#show_shoukuan").click(function(){
+			$(this).addClass('active');
+			$("#show_report").removeClass('active');
+			$("#show_moon").removeClass('active');
+			$("#show_fukuan").removeClass('active');
+			
+			$("#report_content").addClass('hidden');
+			$("#moon_content").addClass('hidden');
+			$("#shoukuan_year_content").removeClass('hidden');
+			$("#fukuan_year_content").addClass('hidden');
+		});
+		$("#show_fukuan").click(function(){
+			$(this).addClass('active');
+			$("#show_report").removeClass('active');
+			$("#show_moon").removeClass('active');
+			$("#show_shoukuan").removeClass('active');
+			
+			$("#report_content").addClass('hidden');
+			$("#moon_content").addClass('hidden');
+			$("#shoukuan_year_content").addClass('hidden');
+			$("#fukuan_year_content").removeClass('hidden');
+		});
+	});
+</script>
+<include file="Public:footer" />

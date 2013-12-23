@@ -1,0 +1,87 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<select name="select1" id="select1" onchange="changeContent()">
+			<optgroup label="预定义视图" class="st" style="border:none">
+				<option value="">所有日志</option>
+				<option <if condition="$Think.get.by eq 'me'">selected="selected"</if> value="?by=me">我的日志</option>
+				<option <if condition="$Think.get.by eq 'today'">selected="selected"</if> value="?by=today">今日日志</option>
+				<option <if condition="$Think.get.by eq 'week'">selected="selected"</if> value="?by=week">本周日志</option>
+				<option <if condition="$Think.get.by eq 'month'">selected="selected"</if> value="?by=month">本月日志</option>
+			</optgroup>
+			<optgroup label="最近的视图" class="st" style="border:none">
+				<option <if condition="$Think.get.by eq 'add'">selected="selected"</if> value="?by=add">最近创建的日志</option>
+				<option <if condition="$Think.get.by eq 'update'">selected="selected"</if> value="?by=update">最近修改的日志</option>
+			</optgroup>
+			<optgroup label="按主题查看视图" class="st" style="border:none">
+				<option value="?module=Leads">线索</option>
+				<option value="?module=Customer">客户</option>
+				<option value="?module=Contacts">联系人</option>
+				<option value="?module=Business">商机</option>
+				<option value="?module=Tasks">任务</option>
+				<option value="?module=Event">活动</option>
+				<option value="?module=Financial">财务</option>
+				<option value="?module=Product">产品</option>
+			</optgroup>
+		</select>
+	</div>
+	<include file="Public:alert" />
+	<div class="row"> 
+		<form action="{:U('user/mydaily_delete')}" method="post">
+			<div class="span12">
+				<button id="delete" type="submit" class="btn">删除</button>
+				<div class="pull-right">
+					<a href="{:U('daily/mydaily_add')}" class="btn btn-primary">新建日志</a>
+				</div>
+			</div>
+			<div class="span12">
+				<if condition="$list eq null"><tr><td>----该视图下暂无日志信息！----</td></tr>
+				<else/>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<th><input id="control_all" class="control_all" type="checkbox" /></th>
+								<th>标题</th>
+								<th>内容</th>
+								<th>创建时间</th>
+								<th>对应栏目</th>
+								<th>&nbsp;</th>
+							</tr>
+						</thead>
+						<tbody>
+							<volist name="list" id="vo">
+							<tr>
+								<td><input class="check_list" type="checkbox" name="dialy_list[]" value="{$vo.daily_id}"/></td>
+								<td>{$vo.subject}</td>
+								<td>{$vo.content|}</td>
+								<td>{$vo.create_date|date="Y-m-d H:i:s",###}</td>
+								<td>&nbsp;</td>
+								<td>
+									<a href="{:U('user/mylog_view','id='.$vo['daily_id'])}">查看</a>
+									<a href="{:U('user/mylog_edit','id='.$vo['daily_id'])}">修改</a>
+								</td>
+							</tr>
+							</volist>
+						</tbody>
+					</table>	
+				</if>
+			</div>
+		</form>
+		<div class="span12">
+			{$page}
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+function changeContent(){
+		a = $("#select1  option:selected").val();
+		window.location.href="{:U('daily/index')}"+a;
+	} 
+$(function(){
+	$("#control_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+})
+</script>
+<include file="Public:footer" />

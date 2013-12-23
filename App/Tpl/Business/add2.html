@@ -1,0 +1,214 @@
+<include file="Public:header" />
+	<div class="container">
+        <!-- Docs nav ================================================== -->
+		<div class="page-header">
+			<h4>添加商机</h4>
+		</div>
+        <div class="row">
+			<div class="span12">
+				<include file="Public:alert"/>
+				<form action="{:U('Business/add')}" method="post">
+					<input type="hidden" name="creator_id" value="{$_SESSION.user_id}"/>
+					<table class="table table-hover" width="95%" border="0" cellspacing="1" cellpadding="0">
+						<thead>
+							<tr>
+								<td>&nbsp;</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/>&nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp;<input type="button" class="btn" onclick="javascript:history.go(-1)" value="返回"/></td>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr> 
+								<td>&nbsp;</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/>&nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>	
+							</tr>
+						</tfoot>
+						<tbody width="100%">
+							<tr><th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>基本信息</th></tr>
+							<tr>
+								<td width="15%" class="tdleft">客户(单击选择)</td>
+								<td width="35%"><input type="hidden" name="customer_id" id="customer_id"/><input  type="text" name="customer_name" id="customer_name"> <a target="_blank" href="{:U('customer/add')}">新建客户</a></td>	
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td width="15%" class="tdleft">联系人(单击选择)</td>
+								<td width="35%"><input type="hidden" name="contacts_id" id="contacts_id"/><input  type="text" name="contacts_name" id="contacts_name"/> <a target="_blank" href="{:U('contacts/add')}">新建联系人</a></td>	
+							</tr>
+							<tr>
+								<td class="tdleft">商机名</td>
+								<td><input type="text" name="name" id="name">&nbsp;&nbsp;<input class="btn btn-mini" id="validate" name="validate" type="button" value="验重"></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">类型</td>
+								<td>
+								<select  type="select" id="type" name="type"/>
+									<option value="">-无-</option>
+									<option value="现有业务">现有业务</option>
+									<option value="新业务">新业务</option>
+								</select>
+								</td>																
+							</tr>
+							<tr>
+								<td class="tdleft">总金额</td>
+								<td><input  type="text" id="total" name="total_price"/></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">可能性(百分比)</td>
+								<td><input  type="text" id="gain_rate" name="gain_rate"/></td>
+							</tr>
+							<tr>
+								<td class="tdleft">预计成交日期</td>
+								<td><input onclick="WdatePicker()"  type="text" id="due_date" name="due_date"/></td>
+								<if condition="C('ismobile') eq 1"><td colspan="2"></td></if>
+								
+							</tr>
+							<tr><th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>其他信息</th></tr>
+							<tr>
+								<td class="tdleft">负责人(单击选择)</td>
+								<td><input type="hidden" name="owner_role_id" id="owner_id" value="{$Think.session.role_id}"/>
+								<input type="text" name="owner_name" id="owner_name" value="{$Think.session.name}"/></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td width="15%" class="tdleft">来源</td>
+								<td>
+									<select name="source_id">
+										<option>--无--</option>
+										<volist name="sourceList" id="vo">
+											<option value="{$vo.source_id}">{$vo.name}</option>
+										</volist>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="tdleft">阶段状态</td>
+								<td>
+									<select name="status_id">
+										<option>--无--</option>
+										<volist name="statusList" id="vo">
+											<option value="{$vo.status_id}">{$vo.name}</option>
+										</volist>
+									</select>
+								</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">下次联系</td>
+								<td><input onclick="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm'})" class="input-small"  type="text" id="nextstep_time" name="nextstep_time"/> &nbsp; <input type="text" id="nextstep" name="nextstep"/></td>
+							</tr>
+							<tr>
+								<td class="tdleft">描述</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>><textarea class="span6" rows="6" name="description" id="description"></textarea></td>
+							</tr>
+						</tbody>
+					</table>
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="hide" id="dialog-message" title="选择客户">loading...</div>
+	<div class="hide" id="dialog-role-list" title="选择所有人">loading...</div>
+	<div class="hide" id="dialog-message3" title="选择联系人">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+
+	$(function(){
+		$('#customer_name').click(function () {
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load("{:U('Customer/listDialog')}");
+		});
+		$('#product_name').click(function () {
+			$('#dialog-message2').dialog('open');
+			$('#dialog-message2').load('{:U("product/listDialog")}');
+			return false;
+		});
+		$('#owner_name').click(
+			function(){
+				$('#dialog-role-list').dialog('open');
+				$('#dialog-role-list').load("{:U('user/listDialog')}");
+			}
+		);
+		$('#contacts_name').click(
+			function(){
+				$customer_name = $('#customer_name').val();
+				$customer_id = $('#customer_id').val();
+				if($customer_name == '' || $customer_name == null){
+					alert('请先选择客户！');
+				}else{
+					$('#dialog-message3').dialog('open');
+					$('#dialog-message3').load('{:U("contacts/radiolistdialog", "customer_id=")}'+$('#customer_id').val());
+				}
+			}
+		);
+	});
+	$('#dialog-message').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		buttons: {
+			"确认": function () {
+				var item = $('input:radio[name="customer"]:checked').val();
+				var name = $('input:radio[name="customer"]:checked').parent().next().html();
+				$('#customer_name').val(name);
+				$('#customer_id').val(item);
+				$('input[name="name"]').val(name);
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		},
+		position:["center",100]
+	});
+	$("#dialog-message3").dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		buttons: { 
+			"确认": function () {
+				var item = $('input:radio[name="contacts"]:checked').val();
+				var name = $('input:radio[name="contacts"]:checked').parent().next().html();
+				$('#contacts_id').val(item);
+				$('#contacts_name').val(name);
+				$(this).dialog("close"); 
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		},
+		position:["center",100]
+	});
+	$("#dialog-role-list").dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		buttons: { 
+			"确认": function () {
+				var item = $('input:radio[name="owner"]:checked').val();
+				var name = $('input:radio[name="owner"]:checked').parent().next().html();
+				if(item) {
+					$('#owner_name').val(name);
+					$('#owner_id').val(item);
+				}
+				$(this).dialog("close"); 
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		},
+		position: ["center", 100]
+	});
+
+	$('#validate').click(
+		function(){
+			name = $('#name').val();
+			if(name!=''){
+				$.post('{:U("business/validate")}',
+					{
+						name:name,
+					},
+					function(data){
+						alert(data.info);
+					},
+				'json');
+			} else {
+				alert('请填写商机名!');
+			}
+		}
+	);
+</script>
+<include file="Public:footer" />

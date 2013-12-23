@@ -1,0 +1,141 @@
+<include file="Public:header" />
+<script type="text/javascript" src="__PUBLIC__/js/kindeditor-all-min.js"></script>
+<link rel="stylesheet" href="__PUBLIC__/css/kindeditor.css" type="text/css" />
+<script type="text/javascript">
+	<if condition="C('ismobile') neq 1">
+		var editor;
+		KindEditor.ready(function(K) {
+			editor = K.create('textarea[name="content"]', {
+				uploadJson:'{:U("file/editor")}',
+				allowFileManager : true,
+				loadStyleMode : false
+			});
+		});
+	</if>
+</script>
+<div class="container">
+	<div class="page-header" style="border:none; font-size:14px; ">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('setting/sendsms')}">发送短信</a></li>
+			<li class="active"><a href="{:U('setting/sendemail')}">发送邮件</a></li>
+		</ul>
+	</div>
+	<include file="Public:alert" />	
+	<notempty name="contacts">
+		<?php $first = 0; ?>
+			<volist name="contacts" id="vo">
+				<if condition="!is_email($vo['email'])">
+					<?php if($first==0){ $first = 1; }else{ $first = 2; } ?>
+					<if condition="$first == 1"><div class="alert alert-warning">部分邮箱由于信息格式不符合，已过滤！<br/>具体如下:</if>
+					{$vo['email']|trim} &nbsp; {$vo['name']}[客户:{$vo['customer_name']}]、	
+				</if>
+			</volist>
+			<if condition="$first != 0"></div></if>
+	</notempty>
+	<div class="row">
+		<div class="span12">
+		</div>
+		<div>
+			<div class="span2 warning pull-left" style="background-color:#f5f5f5;">
+				<pre><h4>操作提示：</h4>
+1、群发邮件时，以换行间隔每个客户，如
+   <span style="color:red">123@5kcrm.com
+   321@5kcrm.com</span>
+2、如需在内容中加入姓名信息，请在邮箱内容中以<span style="color:red">{</span><span style="color:red">name}</span>代替<br><span style="color:red">收件人地址姓名请跟在邮箱后面，如下所示</span>:
+   <span style="color:red">123@5kcrm.com,张三
+   321@5kcrm.com,李四</span><br>
+发件内容中的{name}会自动替换为邮箱之后的姓名
+3、<span style="color:red">请不要在短信内容中填写特殊字符,包括换行符。</span>
+				</pre>
+			</div>
+			<form  action="{:U('setting/sendemail')}" method="post">
+			<div class="pull-left">
+				<div class="pull-left" style="margin-left:30px;">
+					<div class="alert-info alert" style="margin:0px;">收件人邮箱
+					<br>(多个收件人换行隔开)</div>
+					<div><textarea id="emails" name="emails" style="min-height: 375px;width:200px;"><notempty name="contacts">
+						<volist name="contacts" id="vo">
+							<if condition="is_email($vo['email'])">
+								{$vo['email']|trim},{$vo['name']},{$vo['customer_name']}<?php echo chr(10);?>
+							</if>
+						</volist>
+					</notempty></textarea></div>
+				</div>
+				<div class="pull-left" style="margin-left:30px;">
+					<p>
+						<select name="template" id="template" style="width:auto;font-size:12px;" onchange="changeContent()">
+							<option>--选择邮件模板--</option>
+							<volist name="templateList" id="v">
+								<option value="{$v['template_id']}" rel="{$v['content']}" id="{$v['title']}">{$v['subject']}</option>
+							</volist>
+						</select>
+						<a href="{:U('email/index')}" style="color:red;">设置</a>
+					</p>
+					<div>邮件主题：<br><input id="title" name="title" style="width:690px;"></input><div>
+					<div>邮件内容：<br>
+					<textarea id="contented" name="content" placeholder="请阅读左侧操作提示···" style="height: 300px;width:700px;"></textarea><br>
+					<input type="submit" class="btn btn-primary" value="发送"/> &nbsp; 
+					</div>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div> <!-- End #main-content -->
+</div>
+<script type="text/javascript">
+/*function sub(){
+	var img = new Array();
+	var file = new Array();
+	img = $("iframe").contents().find("img").each(function() {
+				img.push($(this).attr("data-ke-src"));
+			});
+	file = $("iframe").contents().find("a").each(function() {
+				file.push($(this).attr("href"));
+			});
+	if(img){
+		$.post('{:U("setting/sendemail")}',
+		{img:img,file:file},
+		function(data){
+			alert(data.info);
+		},
+		'json');
+	}
+}*/
+/*$(function(){
+	$('#submit').click(
+		function(){
+			var img=[];
+			var file=[];
+			$("iframe").contents().find("img").each(function(){
+				img.push($(this).attr("src"));
+			});
+			$("iframe").contents().find("a").each(function(){
+				file.push($(this).attr("data-ke-src"));
+			});
+			 
+			if(img){
+				$.post('{:U("setting/sendemail")}',
+				{img:img,file:file,title:title,emails:emails,content:content},
+				function(data){
+					alert(data.info);
+				},
+				'json');
+			}
+
+		}
+	);
+});*/
+function changeContent(){
+	var a = $('#template option:selected').attr('rel');
+	var b = $('#template option:selected').attr('id');
+	if(a){
+		$('#title').val(b);
+		$("iframe").contents().find("body").html(a);
+	}else{
+		$('#title').val('');
+		$("iframe").contents().find("body").html('');
+	}
+	
+}
+</script>
+<include file="Public:footer" />	

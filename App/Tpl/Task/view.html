@@ -1,0 +1,313 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4><a name="tab">任务详情</a></h4>
+	</div>
+	<div class="row">
+		<div class="tabbable span12">
+			<include file="Public:alert" />
+			<ul class="nav nav-tabs">
+				<li><a href="#tab1">基本信息</a></li>
+				<li><a href="#tab2">进度日志({$task['log_count']})</a></li>
+				<li><a href="#tab3">文件({$task['file_count']})</a></li>
+			</ul>
+			<div class="tab-content">
+					<table class="table">
+						<thead>
+							<tr>
+								<td <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>
+									<p style="font-size: 14px;">
+										<if condition="$task['is_deleted'] neq 1">
+										<present name="comment_role_id">
+										<a id="comment_btn" href="javascript:void(0);">评论</a> &nbsp; | &nbsp; 
+										</present>
+										<a href="javascript:void(0);" class="add_log">添加进度日志</a> &nbsp; | &nbsp; 
+										<a href="javascript:void(0);" class="add_file">添加文件</a> &nbsp; | &nbsp; 
+										<a href="{:U('task/edit','id='.$task['task_id'])}"/>编辑</a> &nbsp; | &nbsp; 
+										<a href="{:U('task/delete','redirect=1&id='.$task['task_id'])}"/>删除</a>
+										<else />
+										<a href="{:U('task/index')}">返回列表页</a>
+										</if>
+									</p>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr><th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>基本信息</th></tr>
+							<tr>
+								<td class="tdleft">主题：</td>
+								<td colspan="3">{$task.subject}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>							
+							</tr>
+							<tr>
+								<td <if condition="C('ismobile') neq 1">width="15%"</if> class="tdleft">执行人：</td>
+								<td <if condition="C('ismobile') neq 1">width="35%"</if> ><notempty name="task.owner.user_name"><a class="role_info" rel="{$task.owner.role_id}" href="javascript:void(0)">{$task.owner.user_name}</a></notempty></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td <if condition="C('ismobile') neq 1">width="15%"</if> class="tdleft" >到期日期：</td>
+								<td <if condition="C('ismobile') neq 1">width="35%"</if>><if condition="$task['due_date'] gt 0">{$task.due_date|date='Y-m-d H:i',###}</if></td>
+							</tr>
+							<tr>
+								<td class="tdleft" >状态：</td>
+								<td>{$task.status}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" >优先级：</td>
+								<td >{$task.priority}</td>								
+							</tr>
+							<tr>
+								<td class="tdleft" >创建时间：</td>
+								<td><if condition="$task['create_date'] gt 0">{$task.create_date|date='Y-m-d H:i:s',###}</if></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft">创建人：</td>
+								<td><notempty name="task.creator.user_name"><a class="role_info" rel="{$task.creator.role_id}" href="javascript:void(0)">{$task.creator.user_name}</a></notempty></td>							
+							</tr>
+							<tr>
+							<notempty name="task.module.module_name">
+								<td class="tdleft">相关{$task.module.module_name}</td>
+								<td ><a target="_blank" href="{:U($task['module']['module'].'/view','id='.$task['module']['module_id'])}">{$task.module.name}</a></td>
+								<if condition="C('ismobile') eq 1"><td colspan="2">&nbsp;</td></if>
+							</tr>
+							</notempty>
+							<tr>
+								<td class="tdleft" >
+									描述：
+								</td><td <if condition="C('ismobile') neq 1">colspan="3"</if> >
+									<if condition="$task.description neq null"><pre style="min-height: 200px;">{$task.description}</pre></if>
+								</td>
+							</tr>
+							<tr>
+								<td class="tdleft">评论:</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>>
+									<table width="100%">
+										<empty name="comment_list">
+											<tr>
+												<td colspan="2">--暂无上级评论!--</td>
+											</tr>
+										<else />
+											<volist name="comment_list" id="vo">
+												<tr>
+													<td colspan="2">评论人:<a class="role_info" rel="{$vo.role_id}" href="javascript:void(0)">{$vo.user_name}</a>（{$vo.create_time|date="Y-m-d H:i",###}）<if condition="$vo['role_id'] == session('role_id')">
+															<a rel="{$vo['comment_id']}" class="edit_comment_btn" href="javascript:void(0);">编辑</a>
+														</if></td>
+												</tr>
+												<tr>
+													<td colspan="2"><if condition="$vo.content neq ''"><pre>{$vo.content}</pre></if></td>
+												</tr>
+											</volist>
+										</empty>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+                    <a name="tab2"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>进度日志</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$task.log eq null">
+							<tr>
+								<td>没有数据</td>
+							</tr>
+						<else />
+							<volist name="task.log" id="vo">
+								<tr>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty> &nbsp; 
+										{$vo.create_date|date="Y-m-d  g:i:s a",###} &nbsp; 
+										<notempty name="vo.create_date"> &nbsp; </notempty>
+										<if condition="C('ismobile') eq 1"><br/></if>
+										{$vo.subject}
+									</td>
+									<td>
+										
+										<if condition="$task['is_deleted'] neq 1"><a href="javascript:void(0)" rel="{$vo.log_id}" class="edit_log">编辑</a>&nbsp; <a href="{:U('log/delete','r=RLogTask&id='.$vo['log_id'])}">删除</a></if>
+									</td>
+								</tr>
+								<tr>
+									<td colspan="2">
+										<if condition="strlen($vo['content']) gt 100">
+											<div id="slog_{$vo.log_id}">
+											<pre>{$vo.content|msubstr=###,0,100}
+											<a class="more" rel="{$vo.log_id}" href="javascript:void(0)">查看全文</a></pre>
+											</div>
+											<div id="llog_{$vo.log_id}" class="hide">
+												<pre>{$vo.content}</pre>
+											</div>
+										<else/>
+											<pre>{$vo.content}</pre>
+										</if>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<if condition="$task['is_deleted'] neq 1">
+							<tr>
+								<td colspan="2">
+									<a href="javascript:void(0);" class="add_log">添加</a>
+								</td>
+							</tr>
+						</if>
+					</table>
+                    <a name="tab3"></a><div style="height:40px;"></div>
+                    <table class="table table-hover">
+                        <tr>
+                            <th>相关文件</th>
+                            <th style="text-align:right"><a href="#tab">返回顶部</a></th>
+                        </tr>
+                    </table>
+					<table class="table">
+						<if condition="$task['file'] eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<td>&nbsp;</td>
+								<td>文件名</td>
+								<td>大小</td>
+								<if condition="C('ismobile') neq 1"><td>添加时间</td>
+								<td>添加者</td></if>
+							</tr>
+							<volist name="task.file" id="vo">
+								<tr>
+									<td class="tdleft"><if condition="$task['is_deleted'] neq 1"><a href="javascript:void(0);" class="add_log"><a href="{:U('file/delete','r=RFileTask&id='.$vo['file_id'])}">删除</a></if></td>
+									<td>
+										<a target="_blank" href="{$vo.file_path}">{$vo.name}</a>
+									</td>
+									<td>
+										{$vo.size}字节
+									</td>
+									<if condition="C('ismobile') neq 1">
+									<td>
+										<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									</if>
+								</tr>
+							</volist>
+						</if>
+						<tr>
+							<td <if condition="C('ismobile') neq 1">colspan="5"<else/>colspan="3"</if>>
+								<if condition="$task['is_deleted'] neq 1"><a href="javascript:void(0);" class="add_file">添加</a></if>
+							</td>
+						</tr>
+					</table>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-file" title="添加附件">loading...</div>
+<div class="hide" id="dialog-log" title="添加日志">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<div class="hide" id="dialog-log-edit" title="编辑日志">loading...</div>
+<if condition="$comment_role_id">
+<div class="hide" id="dialog-comment" title="评论">loading...</div>
+<div class="hide" id="dialog-editcomment" title="修改评论">loading...</div>
+</if>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-file").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log-edit").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-comment").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100],
+	buttons: { 
+		"确认": function () {
+			$('#comment').submit();
+			$(this).dialog("close"); 
+		},
+		"取消": function () {
+			$(this).dialog("close");
+		}
+	}
+});
+$("#dialog-editcomment").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100],
+	buttons: { 
+		"确认": function () {
+			$('#editcomment').submit();
+			$(this).dialog("close"); 
+		},
+		"取消": function () {
+			$(this).dialog("close");
+		}
+	}
+});
+$(function(){
+	$(".add_file").click(function(){
+		$('#dialog-file').dialog('open');
+		$('#dialog-file').load('{:U("file/add","r=RFileTask&module=task&id=".$task["task_id"])}');
+	});
+	$(".add_log").click(function(){
+		$('#dialog-log').dialog('open');
+		$('#dialog-log').load('{:U("log/add","r=RLogTask&module=task&id=".$task["task_id"])}');
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	$(".edit_log").click(function(){
+		$log_id = $(this).attr('rel');
+		$('#dialog-log-edit').dialog('open');
+		$('#dialog-log-edit').load('{:U("log/edit","id=")}'+$log_id);
+	});
+	
+	<if condition="$comment_role_id">
+	$("#comment_btn").click(function(){
+		$('#dialog-comment').dialog('open');
+		$('#dialog-comment').load('{:U("comment/add","to_role_id=".$task["owner_role_id"]."&module=task&module_id=".$task["task_id"])}');
+	});
+	$(".edit_comment_btn").click(function(){
+		comment_id = $(this).attr('rel');
+		$('#dialog-comment').dialog('open');
+		$('#dialog-comment').load('{:U("comment/edit","to_role_id=".$task["owner_role_id"]."&id=")}'+comment_id);
+	});
+	</if>
+	$(".more").click(function(){
+		log_id = $(this).attr('rel');
+		$('#llog_'+log_id).attr('class','');
+		$('#slog_'+log_id).attr('class','hide');
+	});
+});
+</script>
+<include file="Public:footer" />

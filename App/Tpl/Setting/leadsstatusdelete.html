@@ -1,0 +1,21 @@
+<form class="form-horizontal" action="{:U('setting/leadsstatusdelete')}" method="post">
+	<input type="hidden" name="old_id" value="{$old_id}"/>
+	<table class="table">
+		<tr>
+			<th colspan="2">更改信息</th>
+		</tr>
+		<tr>
+			<td class="tdleft">将商机中此状态更新为：</td>
+			<td>
+				<select name="new_id">
+					<volist name="statusList" id="vo"><option value="{$vo.status_id}">{$vo.name}</option></volist>
+				</select></p>
+			</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input class="btn btn-primary" type="submit" value="删除"/> &nbsp;
+			<input class="btn" type="button" onclick="javascript:$('#dialog-delete').dialog('close');" value="取消"/></td>
+		</tr>
+	</table>
+</form>

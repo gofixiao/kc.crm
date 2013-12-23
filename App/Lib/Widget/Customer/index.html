@@ -1,0 +1,29 @@
+<div class="{$class}">
+	<div>
+		<h4>{$title}<small> &nbsp; <a rel="{$id}" class="update" href="javascript:void(0)" id="update_widget"><i class="icon-pencil"></i></a> &nbsp; <a href="{:U('index/widget_delete', 'id='.$id)}" id="delete_widget"><i class="icon-remove"></i></a> &nbsp; </small></h4>
+	</div>
+	<if condition="$list eq null">
+		<p>----暂无数据！----</p>
+	<else/>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+			  <th>客户名称</th>
+			  <th>来源</th>
+			  <th>行业</th>
+			  <th>地址</th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="list" id="vo">
+				<tr>
+					<td><a href="{:U('customer/view', 'id='.$vo['customer_id'])}">{$vo.name}</a></td>
+					<td>{$vo.origin}</td>
+					<td>{$vo.industry}</td>
+					<td>{$vo.address}</td>
+				</tr>
+			</volist>
+		</tbody>
+	</table>
+	</if>				
+</div>

@@ -1,0 +1,212 @@
+<script type="text/javascript" src="__PUBLIC__/js/jscolor/jscolor.js"></script>
+<script type="text/javascript" src="__PUBLIC__/js/formValidator-4.0.1.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="__PUBLIC__/js/formValidatorRegex.js" charset="UTF-8"></script>
+<script type="text/javascript" language="javascript" src="__PUBLIC__/js/DateTimeMask.js" charset="UTF-8"></script>
+<form class="form-horizontal" action="{:U('setting/fieldadd')}" method="post" name="form1" id="form1">	
+	<input type="hidden" name="model" value="{$model}"/>
+	<table class="table">
+		<tr> 
+			<th colspan="2"><span class="icon-th-list">&nbsp; 字段信息</span></th>
+		</tr>
+		<tr>
+			<td width="30%" class="tdleft">字段类型：</td>
+			<td>
+				<select name="form_type" id="form_type" onchange="changeContent()">
+					<option value="text">单行文本</option>
+					<option value="textarea">多行文本</option>
+					<option value="editor">编辑器</option>	
+					<option value="box">选项</option>	
+					<option value="datetime">日期</option>	
+					<option value="number">数字</option>
+					<option value="floatnumber">小数（小数点后保留两位）</option>
+					<option value="mobile">手机</option>
+					<option value="phone">电话</option>
+					<option value="email">邮箱</option>
+					<option value="address">地址</option>
+				</select>
+			</td>
+		</tr>
+		<tr id="info_type_td">
+			<td width="30%" class="tdleft">信息类型：</td>
+			<td>
+				<input type="radio" name="is_main" value="1" />主要信息&nbsp;(可用于搜索)</br>
+				<input type="radio" name="is_main" value="0" checked="checked" />附加信息&nbsp;(减轻系统搜索压力)
+			</td>
+		</tr>
+		<tr id="box_type_td" style="display:none;">
+			<td width="30%" class="tdleft" >选项类型：</td>
+			<td>
+				<input type="radio" name="setting[boxtype]" value="radio" checked="checked"/>单选
+				<input type="radio" name="setting[boxtype]" value="checkbox"/>多选
+				<input type="radio" name="setting[boxtype]" value="select"/>下拉框
+			</td>
+		</tr>
+		<tr id="box_data_td" style="display:none;">
+			<td width="30%" class="tdleft">选项列表：</td>
+			<td>
+				<textarea name="setting[options]"></textarea>
+				<br/><span style="color:red;">*</span>在此输入选项值，值与值之间需换行隔开如（自动去除空白和重复选项）：<br/>选项1<br/>选项2<br />
+			</td>
+		</tr>
+		<tr id='field_td'>
+			<td width="30%" class="tdleft">字段名：</td>
+			<td>
+			<input type="text" id="field" name="field" class="span3"/><br /><span style="color:red;">*</span><span id="fieldTip"></span>
+			</td>
+		</tr>
+		<tr id="name_td">
+			<td width="30%" class="tdleft">标识名：</td>
+			<td><input type="text" name="name" id="name" class="span3"/><br/><span style="color:red;">*</span><span id="nameTip"></span></td>
+		</tr>
+		<tr id="max_length_td">
+			<td width="30%" class="tdleft">最大字段长度：</td>
+			<td><input type="text" name="max_length" id="max_length" class="span3"/><br /><span id="max_lengthTip"></span></td>
+		</tr>
+		<tr id="default_value_td">
+			<td width="30%" class="tdleft">默认值：</td>
+			<td><input type="text" name="default_value" id="default_value" class="span3"/><br /><span id="default_valueTip"></span></td>
+		</tr>
+		<tr id="is_validate_td">
+			<td width="30%" class="tdleft">是否验证：</td>
+			<td>
+				<input class="validate" name="is_validate" onclick="changeVali(1)" type="radio" value="1"/> 是 &nbsp; &nbsp; <input class="validate" onclick="changeVali(0)" name="is_validate" checked="checked" type="radio" value="0"/> 否
+			</td>
+		</tr>
+		<tr id="is_unique_td" style="display:none;">
+			<td width="30%" class="tdleft">是否唯一：</td>
+			<td>
+				<input name="is_unique" type="radio" value="1"/> 是 &nbsp; &nbsp; <input name="is_unique" checked="checked" type="radio" value="0"/> 否
+			</td>
+		</tr>
+		<tr id="is_null_td" style="display:none;">
+			<td width="30%" class="tdleft">是否允许为空：</td>
+			<td>
+				<input name="is_null" type="radio" checked="checked" value="1"/> 是 &nbsp; &nbsp; <input name="is_null" type="radio" value="0"/> 否
+			</td>
+		</tr>
+		<tr id="in_index_td">
+			<td width="30%" class="tdleft">列表页显示：</td>
+			<td>
+				<input name="in_index" type="radio" value="1"/> 是 &nbsp; &nbsp; <input name="in_index" checked="checked" type="radio" value="0"/> 否
+			</td>
+		</tr>
+		<tr id="color_td">
+			<td width="30%" class="tdleft">字段显示颜色：</td>
+			<td><input onclick="javascript:jscolor.install();" class="color" value="333333" name="color"/></td>
+		</tr>
+		<tr id="tips_td">
+			<td width="30%" class="tdleft">输入提示：</td>
+			<td><input type="text" name="input_tips" class="span3"/><br/><span style="color:red;">*</span>显示在字段别名下方作为表单输入提示</td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input class="btn btn-primary" type="submit" value="保存"/> &nbsp;
+			<input class="btn" type="button" onclick="javascript:$('#dialog_field_add').dialog('close');" value="取消"/></td>
+		</tr>
+	</table>
+</form>
+<script type="text/javascript">
+    $(function(){
+        jscolor.bind();
+		$('.validate').click(function(){
+			
+		});
+        $.formValidator.initConfig({formID:"form1",debug:false,submitOnce:true,
+            onError:function(msg,obj,errorlist){
+                /*
+                $("#errorlist").empty();
+                $.map(errorlist,function(msg){
+                    $("#errorlist").append("<li>" + msg + "</li>")
+                });
+                */
+                alert(msg);
+            },
+            submitAfterAjaxPrompt : '有数据正在异步验证，请稍等...'
+        });
+        $("#field").formValidator({tipID:"fieldTip",empty:false,onShow:"只能由小写英文字母和下划线组成，并且以字母开头，不以下划线结尾,例如：article_title",onFocus:"只能由英文字母和下划线组成，并且以字母开头，不以下划线结尾	例如：article_title",onCorrect:"√格式正确"}).inputValidator({min:1,empty:{leftEmpty:false,rightEmpty:false,emptyError:"两边不能有空符号"},onError:"字段名不能为空"}).regexValidator({regExp:"field",param:'i',dataType:"enum",onError:"格式错误! 只能由小写英文字母和下划线组成，且大于2位数"});
+        $("#name").formValidator({tipID:"nameTip",empty:false,onShow:"例如：文章标题",onFocus:"请输入标示名称",onCorrect:"√格式正确"}).inputValidator({min:1,empty:{leftEmpty:false,rightEmpty:false,emptyError:"两边不能有空符号"},onError:"标示名称不能为空"});
+        $("#max_length").formValidator({tipID:"max_lengthTip",empty:true,onEmpty:'',onShow:" ",onFocus:" ",onCorrect:"√"}).regexValidator({regExp:"intege1",param:'i',dataType:"enum",onError:"只能填写正整数"}).inputValidator({max:1000,type:"value",onError:"必须在1-1000之间"});
+        
+    });
+	function changeVali(k){
+		if(k){
+			$("#is_null_td").show();
+			var type_id = $("#form_type").val();
+			if(type_id == 'box' || type_id == 'textarea' || type_id == 'datetime' || type_id == 'editor' || type_id='address') {
+				$("#is_unique_td").hide();
+			}else{
+				$("#is_unique_td").show();
+			}
+		}else{
+			hideVali();
+			
+		}
+	}
+	function hideVali(){
+		$("input[name=is_unique]").last().prop('checked','true');
+		$("input[name=is_null]").first().prop('checked','true');
+		$("#is_unique_td").hide();
+		$("#is_null_td").hide();
+	}
+	function changeContent() {
+		var type_id = $("#form_type").val();
+		if(type_id == 'box'){
+			$("#box_data_td").show();
+			$("#box_type_td").show();
+			$("#max_length_td").hide();
+			$("#default_value_td").hide();
+            $("#default_value").unFormValidator(true);
+            $("#max_length").unFormValidator(true);
+		}else if(type_id == 'textarea'){
+			$("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#max_length_td").hide();
+			$("#default_value_td").hide();
+            $("#default_value").unFormValidator(true);
+            $("#max_length").unFormValidator(true);
+		}else if(type_id == 'datetime'){
+			$("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#default_value_td").hide();
+			$("#max_length_td").hide();
+            $("#default_value").unFormValidator(true);
+            $("#max_length").unFormValidator(true);
+		}else if(type_id == 'editor'){
+			$("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#default_value_td").hide();
+			$("#max_length_td").hide();
+            $("#default_value").unFormValidator(true);
+            $("#max_length").unFormValidator(true);
+		}else if(type_id == 'address'){
+			$("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#default_value_td").hide();
+			$("#max_length_td").hide();
+            $("#default_value").unFormValidator(true);
+            $("#max_length").unFormValidator(true);
+		}else if(type_id == 'number'){
+            $("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#max_length_td").show();
+			$("#default_value_td").show();
+			$("#default_value").formValidator({tipID:"default_valueTip",empty:true,onEmpty:'',onShow:" ",onFocus:" ",onCorrect:"√"}).regexValidator({regExp:"intege1",param:'i',dataType:"enum",onError:"只能填写正整数"}).inputValidator({min:-2147483647,max:2147483647,type:"value",onError:"必须在-2147483647-2147483647之间"});
+            $("#max_length").formValidator({tipID:"max_lengthTip",empty:true,onEmpty:'',onShow:" ",onFocus:" ",onCorrect:"√"}).regexValidator({regExp:"intege1",param:'i',dataType:"enum",onError:"只能填写正整数"}).inputValidator({max:11,type:"value",onError:"必须在1-11之间"});
+		}else if(type_id == 'floatnumber'){
+            $("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#max_length_td").show();
+			$("#default_value_td").show();
+			$("#default_value").formValidator({tipID:"default_valueTip",empty:true,onEmpty:'',onShow:" ",onFocus:" ",onCorrect:"√"}).regexValidator({regExp:"intege1",param:'i',dataType:"enum",onError:"只能填写正数"}).inputValidator({min:0.00,max:32767.99,type:"value",onError:"必须在-2147483647-2147483647之间"});
+            $("#max_length").formValidator({tipID:"max_lengthTip",empty:true,onEmpty:'',onShow:" ",onFocus:" ",onCorrect:"√"}).regexValidator({regExp:"intege1",param:'i',dataType:"enum",onError:"只能填写正数"}).inputValidator({max:7,type:"value",onError:"必须在3-7之间"});
+		}else{
+			$("#box_data_td").hide();
+			$("#box_type_td").hide();
+			$("#max_length_td").show();
+			$("#default_value_td").show();
+            $("#max_length").formValidator({tipID:"max_lengthTip",empty:true,onEmpty:'',onShow:" ",onFocus:" ",onCorrect:"√"}).regexValidator({regExp:"intege1",param:'i',dataType:"enum",onError:"只能填写正整数"}).inputValidator({max:1000,type:"value",onError:"必须在1-1000之间"});
+            $("#default_value").unFormValidator(true);
+		}
+		hideVali();
+	}
+</script>

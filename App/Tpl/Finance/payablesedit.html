@@ -1,0 +1,161 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>财务<small> - <a href="{:U('finance/index','t=receivables')}">应收款</a> | 
+		<a class="active" href="{:U('finance/index','t=payables')}">应付款</a> | 
+		<a href="{:U('finance/index','t=receivingorder')}">收款单</a> | 
+		<a href="{:U('finance/index','t=paymentorder')}">付款单</a> | <a href="{:U('finance/analytics')}">统计</a></small> </h4>
+	</div>
+	<include file="Public:alert" />	
+	<div class="row">
+		<div class="span12">
+			<form action="{:U('finance/edit','t=payables')}" method="post">				
+				<input type='hidden' name="id" value="{$info['payables_id']}"/>
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="取消"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="取消"/></td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<tr>
+							<th colspan="2">修改应付款</th>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">应付款名</td>
+							<td valign="middle"><input name="name" id="name" class="text-input large-input" type="text" value="{$info['name']}" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">合同(单击选择)</td>
+							<td valign="middle">
+							<input name="contract_id" id="contract_id" type="hidden" value="{$info['contract_id']}" />
+							<input name="contract_name" id="contract_name" class="text-input large-input" type="text" value="{$info['contract_name']}" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" width="20%" valign="middle">*客户(单击选择)</td>
+							<td valign="middle"><input name="customer_id" id="customer_id" type="hidden" value="{$info['customer_id']}" /><input name="customer" id="customer" class="text-input large-input" type="text" value="{$info['customer_name']}" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">应付金额</td>
+							<td valign="middle"><input class="text-input large-input" id="price" name="price" type="text" value="{$info['price']}" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">应付款时间</td>
+							<td valign="middle"><input onclick="WdatePicker()"  type="text" id="pay_time" name="pay_time" value="{$info['pay_time']|date="Y-m-d",###}" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">负责人</td>
+							<td valign="middle"><input type="hidden" id="owner_role_id" name="owner_role_id" value="{$info['owner_role_id']}" />
+							<input class="text-input large-input" id="owner_name" name="owner_name" type="text" value="{$info['owner']['user_name']}" /></td>
+						</tr>
+						<tr>
+							<td class="tdleft" valign="middle">描述</td>
+							<td valign="middle"><textarea class="span6" rows="6" name="description">{$info['description']}</textarea></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div> <!-- End #tab1 -->	
+	</div> <!-- End #main-content -->	
+</div>
+<div id="dialog-message" title="选择客户">loading...</div>
+<div id="dialog-message2" title="选择合同">loading...</div>
+<div id="dialog-message3" title="选择负责人">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else />width=800;</if>
+$("#dialog-message").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="customer"]:checked').val();
+			var name = $('input:radio[name="customer"]:checked').parent().next().html();
+			if(item){
+				$('#customer').val(name);
+				$('#customer_id').val(item);
+			}
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$("#dialog-message3").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			if(item){
+				$('#owner_name').val(name);
+				$('#owner_role_id').val(item);
+			}
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$("#dialog-message2").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: {
+		"Ok": function () {
+			var item = $('input:radio[name="contract"]:checked').val();
+			var name = $('input:radio[name="contract"]:checked').parent().next().html();
+			var next_item = $('input:radio[name="contract"]:checked').parent().next().next().html();
+			var next_name = $('input:radio[name="contract"]:checked').parent().next().next().next().html();
+			if(item){
+				$('#contract_name').val(name);
+				$('#contract_id').val(item);
+				$('#customer_id').val(next_item);
+				$('#customer').val(next_name);
+			}
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+$(function(){
+	$("#customer").click(
+		function(){
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load('{:U("customer/listDialog","by=all")}');
+		}
+	);
+	$("#contract_name").click(
+		function(){
+			$('#dialog-message2').dialog('open');
+			$('#dialog-message2').load('{:U("contract/listDialog","by=all")}');
+		}
+	);
+	$("#owner_name").click(
+		function(){
+			$('#dialog-message3').dialog('open');
+			$('#dialog-message3').load('{:U("user/listDialog","by=all")}');
+		}
+	);
+});
+</script>
+<include file="Public:footer" />	

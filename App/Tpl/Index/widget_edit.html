@@ -1,0 +1,49 @@
+<form class="form-horizontal" action="{:U('index/widget_edit')}" method="post" >
+	<input name="widget_id" type="hidden" value="{$edit_demo['id']}"/>
+	<div class="control-group">
+		<label class="control-label">选择模块</label>
+		<div class="controls">
+			<select name="widget">
+				<option <if condition="$edit_demo['widget'] eq Leads">selected="selected"</if> value="Leads">线索</option>
+				<option <if condition="$edit_demo['widget'] eq Customer">selected="selected"</if> value="Customer">客户</option>
+				<option <if condition="$edit_demo['widget'] eq Contacts">selected="selected"</if> value="Contacts">联系人</option>
+				<option <if condition="$edit_demo['widget'] eq Business">selected="selected"</if> value="Business">商机</option>
+				<option <if condition="$edit_demo['widget'] eq Task">selected="selected"</if> value="Task">任务</option>
+				<option <if condition="$edit_demo['widget'] eq Event">selected="selected"</if> value="Event">日程</option>
+				<option <if condition="$edit_demo['widget'] eq Receivables">selected="selected"</if> value="Receivables">应收款</option>
+				<option <if condition="$edit_demo['widget'] eq Payables">selected="selected"</if> value="Payables">应付款</option>
+				<option <if condition="$edit_demo['widget'] eq Receivingorder">selected="selected"</if> value="Receivingorder">收款单</option>
+				<option <if condition="$edit_demo['widget'] eq Paymentorder">selected="selected"</if> value="Paymentorder">付款单</option>
+				<option <if condition="$edit_demo['widget'] eq Product">selected="selected"</if> value="Product">产品</option>
+				<option <if condition="$edit_demo['widget'] eq Knowledge">selected="selected"</if> value="Knowledge">知识</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">组件名</label>
+		<div class="controls">
+			<input type="text" id="title" name="title" value="{$edit_demo['title']}"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">宽度</label>
+		<div class="controls">
+			<select name="style">
+				<option <if condition="$edit_demo['style'] eq '1'">selected="selected"</if> value="1">一栏</option>
+				<option <if condition="$edit_demo['style'] eq '2'">selected="selected"</if> value="2">半栏</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">显示数量</label>
+		<div class="controls">
+			<input type="text" id="limit" name="limit" value="{$edit_demo['limit']}"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label"></label>
+		<div class="controls">
+			<input name="submit" class="btn btn-primary" type="submit" value="保存"/>
+		</div>
+	</div>
+</form>

@@ -1,0 +1,241 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="page-header">
+			<h4>联系人详情</h4>
+		</div>
+		<div class="row">
+			<div class="tabbable span12">
+				<include file="Public:alert" />
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#tab1" data-toggle="tab">基本信息</a></li>
+					<li><a href="#tab2" data-toggle="tab">沟通日志({$contacts['log_count']})</a></li>
+					<li><a href="#tab3" data-toggle="tab">附件({$contacts['file_count']})</a></li>
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab1">
+						<table class="table" width="95%" border="0" cellspacing="1" cellpadding="0">
+							<thead>
+								<tr>
+									<td <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>
+										<p style="font-size: 14px;">
+											<if condition="$contacts['is_deleted'] == 0">
+												<a href="javascript:void(0);" class="add_log">添加沟通日志</a> | 
+												<a href="javascript:void(0);" class="add_file">添加附件</a> | 
+												<a href="{:U('contacts/edit', 'id='.$contacts['contacts_id'])}">编辑</a> |
+												<a href="{:U('contacts/delete', 'id='.$contacts['contacts_id'])}">删除</a> | 
+												<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+											<else />
+												<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+											</if>
+										</p>
+									</td>
+								</tr>
+							</thead>
+							<tr><th <if condition="C('ismobile') eq 1">colspan="2"<else />colspan="4"</if>>基本信息</th></tr>
+							<tr>
+								<td class="tdleft" width="15%">姓名：</td>
+								<td width="35%">{$contacts.name}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" width="15%">尊称：</td>
+								<td with="35%">{$contacts.saltname}</td>
+							</tr>
+							<tr>
+								<td class="tdleft">负责人:</td>
+								<td><notempty name="contacts.owner.user_name"><a class="role_info" rel="{$contacts.owner.role_id}" href="javascript:void(0)">{$contacts.owner.user_name}</a></notempty></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" >所属客户：</td>
+								<td><a target="_blank" href="{:U('Customer/view', 'id='.$contacts['customer']['customer_id'])}">{$contacts.customer.name}</a></td>
+							</tr>
+							<tr>
+								<td class="tdleft" >职位：</td>
+								<td>{$contacts.post}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" >手机：</td>
+								<td><if condition="C('ismobile') neq 1 ">{$contacts.telephone}<else /><a href="tel://{$contacts.telephone}">{$contacts.telephone}</a></if></td>
+							</tr>
+							<tr>
+								<td class="tdleft" >邮箱：</td>
+								<td>{$contacts.email}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" >QQ：</td>
+								<td>{$contacts.qq}</td>
+							</tr>
+							<tr>
+								<td class="tdleft" >联系地址：</td>
+								<td>{$contacts.address}</td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" >邮编：</td>
+								<td>{$contacts.zip_code}</td>
+							</tr>
+							<tr>
+								<td class="tdleft" >创建时间</td>
+								<td><if condition="$contacts.create_time gt 0">{$contacts.create_time|date="Y-m-d H:i",###}</if></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+								<td class="tdleft" >修改时间：</td>
+								<td><if condition="$contacts.update_time gt 0">{$contacts.update_time|date="Y-m-d H:i",###}</if></td>
+							</tr>
+							
+							<tr>
+								<td class="tdleft" >备注：</td>
+								<td <if condition="C('ismobile') neq 1">colspan="3"</if>>{$contacts.description}</td>
+							</tr>
+							<tr>
+								<td class="tdleft">名片二维码信息：</td>
+								<td colspan="3" style="color:#005580;">
+									<div class="pull-left"><img src="{$contacts['rq']}"/></div><div class="pull-left">功能说明：<br/>1、打开手机里的二维码扫描软件(推荐使用:<font color="red">我查查、微信、搜狗输入法</font>等，而UC手机浏览器、QQ、新浪微博等会由于软件自身功能限制的原因识别不出来)<br/>2、直接扫描本页面的联系人名片二维码即可</div>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="tab-pane" id="tab2">
+						<table class="table table-hover">
+							<if condition="$contacts.log eq null">
+								<tr>
+									<th>没有数据</th>
+								</tr>
+							<else />
+								<volist name="contacts.log" id="vo">
+									<tr>
+										<th>
+											<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty> &nbsp; 
+											{$vo.create_date|date="Y-m-d  g:i:s a",###} &nbsp; 
+											<notempty name="vo.create_date"> &nbsp; </notempty>
+											<if condition="C('ismobile') eq 1"><br/></if>
+											{$vo.subject}
+										</th>
+										<th>
+											<if condition="$contacts['is_deleted'] neq 1"><a href="javascript:void(0)" rel="{$vo.log_id}" class="edit_log">编辑</a>&nbsp; <a href="{:U('log/delete','r=RContactsLog&id='.$vo['log_id'])}">删除</a></if>
+										</th>
+									</tr>
+									<tr>
+										<td colspan="2">
+											<if condition="strlen($vo['content']) gt 100">
+												<div id="slog_{$vo.log_id}">
+												<pre>{$vo.content|msubstr=###,0,100}
+												<a class="more" rel="{$vo.log_id}" href="javascript:void(0)">查看全文</a></pre>
+												</div>
+												<div id="llog_{$vo.log_id}" class="hide">
+													<pre>{$vo.content}</pre>
+												</div>
+											<else/>
+												<pre>{$vo.content}</pre>
+											</if>
+										</td>
+									</tr>
+								</volist>
+							</if>
+							<if condition="$contacts['is_deleted'] neq 1">
+								<tr>
+									<td colspan="2">
+										<a href="javascript:void(0);" class="add_log">添加</a>
+									</td>
+								</tr>
+							</if>
+						</table>
+					</div>
+					<div class="tab-pane" id="tab3">
+						<table class="table table-hover">
+							<if condition="$contacts.file eq null">
+								<tr>
+									<th>没有数据 </th>
+								</tr>
+							<else /> 
+								<tr>
+									<th>&nbsp;</th>
+									<th>文件名</th>
+									<th>大小</th>
+									<th>添加者</th>
+									<th>添加时间</th>
+								</tr>
+								<volist name="contacts.file" id="vo">
+									<tr>
+										<td><a href="{:U('file/delete', 'id='.$vo['file_id'].'&r=RContactsFile')}">删除</a></td>
+										<td>
+											<a target="_blank" href="{$vo.file_path}">{$vo.name}</a>
+										</td>
+										<td>
+											{$vo.size}字节
+										</td>
+										<td>
+											<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+										</td>
+										<td>
+											<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+										</td>
+									</tr>
+								</volist>
+							</if>
+							<if condition="$contacts['is_deleted'] == 0">
+								<tr>
+									<td colspan="5">
+										<a href="javascript:void(0);" class="add_file">添加</a>
+									</td>
+								</tr>
+							</if>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div> <!-- End #tab1 -->
+	</div> <!-- End .content-box-content -->						
+<div class="hide" id="dialog-file" title="添加附件">loading...</div>
+<div class="hide" id="dialog-log" title="添加日志">loading...</div>
+<div class="hide" id="dialog-log-edit" title="编辑日志">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-file").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log-edit").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(function(){
+	$(".add_file").click(function(){
+		$('#dialog-file').dialog('open');
+		$('#dialog-file').load('{:U("file/add", "r=RContactsFile&module=contacts&id=".$contacts["contacts_id"])}');
+	});
+	$(".add_log").click(function(){
+		$('#dialog-log').dialog('open');
+		$('#dialog-log').load('{:U("log/add", "r=RContactsLog&module=contacts&id=".$contacts["contacts_id"])}');
+	});
+	$(".edit_log").click(function(){
+		$log_id = $(this).attr('rel');
+		$('#dialog-log-edit').dialog('open');
+		$('#dialog-log-edit').load('{:U("log/edit","id=")}'+$log_id);
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	$(".more").click(function(){
+		log_id = $(this).attr('rel');
+		$('#llog_'+log_id).attr('class','');
+		$('#slog_'+log_id).attr('class','hide');
+	});
+});
+</script>
+<include file="Public:footer" />	

@@ -1,0 +1,11 @@
+<form action="{:U(customer/set)}" method="post">
+	<table class="table table-hover">
+		<tr>
+			<td class="tdleft">超出天数放入客户池：</td>
+			<td width="60%">
+				<input class="input-small" type="text" id="days" name="days" value="{$outdays}" size="5"/>天
+			</td>
+		</tr>
+		<tr><td></td><td  colspan="1" align="center"><input type="submit" id="submit" name="submit" value="确定"/></td></tr>
+	</table>
+</form>

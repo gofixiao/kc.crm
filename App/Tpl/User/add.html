@@ -1,0 +1,260 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="page-header">
+			<h4>添加用户</h4>
+		</div>
+		<div class="row">
+			<div class="span12">
+				<include file="Public:alert" />
+				<ul class="nav nav-tabs">
+					<li class="active"><a href="#tab2" data-toggle="tab">快捷添加</a></li>
+					<li><a href="#tab1" data-toggle="tab">邮箱邀请</a></li>
+				</ul>
+			
+				<div class="tab-content">
+					<div class="tab-pane" id="tab1">
+						<form id="add" action="{:U('user/add')}" method="post">
+						<span style="color:red;">*邮箱邀请：输入用户邮箱等信息后，添加者需要邮箱验证激活后才可以登录</span><br/>
+						<input type="hidden" name="radio_type" value="email">
+							<table style="width:580px" class="table">
+								<thead>
+									<tr>
+										<th colspan="2">基本信息</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="tdleft">用户名&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<input class="span3" type="text" name="name" id="name"/>
+										</td>
+									</tr>
+									<tr>
+										<td class="tdleft">邮箱&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<input class="span3" type="text" name="email" id="email"/>	
+										</td>
+									</tr>
+									<if condition="session('?admin')">
+										<tr>
+											<td class="tdleft">用户类别&nbsp;<span style="color:red;">*</span></td>  
+											<td>
+												<select name="category_id">
+													<option value=""></option>
+													<volist name="categoryList" id="vo">
+														<option <if condition="$value['category_id'] eq $vo['category_id']">selected="selected"</if> value="{$vo.category_id}">{$vo.name}</option>
+													</volist>
+												</select>
+											</td>
+										</tr>
+									<else />
+										<input type="hidden" name="category_id" value="2"/>
+									</if>
+									<tr>
+										<td class="tdleft">部门&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<select id="department" name="department_id" onchange="changeRoleContent()">
+												<option value=""></option>
+												<volist name="department_list" id="temp">
+													<option value="{$temp.department_id}">{$temp.name}</option>
+												</volist>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td class="tdleft">岗位&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<select id="role" name="position_id">
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td>&nbsp;</td>  
+										<td>
+											<input class="btn btn-primary" name="submit" type="submit" value="添加"/>&nbsp; <input class="btn btn-primary" name="submit" type="submit" value="添加并新建"/> &nbsp;<input class="btn" onclick="javascript:history.go(-1)" type="reset" value="返回"/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</form>
+					</div>
+					<div class="tab-pane active" id="tab2">
+						<span style="color:red;">*快捷添加：输入用户名密码等信息后直接添加后方可登录</span><br/>
+						<form id="add" action="{:U('user/add')}" method="post">
+							<table style="width:580px" class="table">
+								<thead>
+									<tr>
+										<th colspan="2">基本信息</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td class="tdleft">用户名&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<input class="span3" type="text" name="name" id="name"/>
+										</td>
+									</tr>
+									<tr>
+										<td class="tdleft">密码<span style="color:red;">*</span></td>  
+										<td>
+											<input class="span3" type="password" name="password" id="password"/>
+										</td>
+									</tr>
+									<if condition="session('?admin')">
+										<tr>
+											<td class="tdleft">用户类别&nbsp;<span style="color:red;">*</span></td>  
+											<td>
+												<select name="category_id">
+													<option value=""></option>
+													<volist name="categoryList" id="vo">
+														<option <if condition="$value['category_id'] eq $vo['category_id']">selected="selected"</if> value="{$vo.category_id}">{$vo.name}</option>
+													</volist>
+												</select>
+											</td>
+										</tr>
+									<else />
+										<input type="hidden" name="category_id" value="2"/>
+									</if>
+									<tr>
+										<td class="tdleft">部门&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<select id="department2" name="department_id" onchange="changeRoleContent2()">
+												<option value=""></option>
+												<volist name="department_list" id="temp">
+													<option value="{$temp.department_id}">{$temp.name}</option>
+												</volist>
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td class="tdleft">岗位&nbsp;<span style="color:red;">*</span></td>  
+										<td>
+											<select id="role2" name="position_id">
+											</select>
+										</td>
+									</tr>
+									<tr>
+										<td>&nbsp;</td>  
+										<td>
+											<input class="btn btn-primary" name="submit" type="submit" value="添加"/>&nbsp; <input class="btn btn-primary" name="submit" type="submit" value="添加并新建"/> &nbsp;<input class="btn" onclick="javascript:history.go(-1)" type="reset" value="返回"/>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="hide" id="dialog-message3" title="添加岗位">loading...</div>
+	<script type="text/javascript">
+		$("#dialog-message3").dialog({
+			autoOpen: false,
+			modal: true,
+			width: 600,
+			maxHeight: 400,
+			position: ["center",100],
+			buttons: {
+				"确认": function () {
+					des = $('#description').val();
+					role_name = $('#role_name').val();
+					parent_id = $('#parent').val();
+					department_id = $('#department').val();
+					
+					if(role_name!=''){
+						$.post('{:U("user/role_ajax_add")}',
+							{
+								name:role_name,
+								parent_id:parent_id,
+								department_id:department_id,
+								description:des
+							},
+							function(data){
+								if(data.status == 1){
+									$department = $("#department").find("option:selected").text(); 
+									$("#role1").html('');
+									$("#role2").html('');
+									$("#role2").find("option[value='"+data.role_id+"']").attr("selected",true);
+									$("#role1").find("option[value='"+data.role_id+"']").attr("selected",true);
+									for( i = 0; i < data.data.role_list.length; i++) {
+										$("#role1").append("<option value='"+data.data.role_list[i]['role_id']+"'>"+data.data.role_list[i]['name']+"</option>");
+										$("#role2").append("<option value='"+data.data.role_list[i]['role_id']+"'>"+data.data.role_list[i]['name']+"</option>");
+									}
+									$('#dialog-message3').dialog('close');
+								} else if(data.status == 0) {
+									alert("添加失败,请确认添加信息！");
+								}
+							},
+						'json');
+					} else {
+						alert("请输入完整信息！");
+					}
+				},
+				"取消": function () {
+					$(this).dialog("close");
+				}
+			}
+		});
+		$(".add_role").click(function(){
+			$('#dialog-message3').dialog('open');
+			$('#dialog-message3').load('{:U("user/role_ajax_add")}');
+		});
+		function changeRoleContent(){
+			department_id = $('#department').val();
+			if(department_id == ''){
+				$("#role").html('');
+			}else{
+				$.ajax({
+					type:'get',
+					url:'index.php?m=user&a=getpositionlist&id='+department_id,
+					async:false,
+					success:function(data){
+						options = '';
+						$.each(data.data, function(k, v){
+							options += '<option value="'+v.position_id+'">'+v.name+'</option>';
+						});
+						$("#role").html(options);
+					},
+					dataType:'json'
+				});		
+			}
+		}
+		function changeRoleContent2(){
+			department_id = $('#department2').val();
+			if(department_id == ''){
+				$("#role2").html('');
+			}else{
+				$.ajax({
+					type:'get',
+					url:'index.php?m=user&a=getpositionlist&id='+department_id,
+					async:false,
+					success:function(data){
+						options = '';
+						$.each(data.data, function(k, v){
+							options += '<option value="'+v.position_id+'">'+v.name+'</option>';
+						});
+						$("#role2").html(options);
+					},
+					dataType:'json'
+				});	
+			}
+		}
+		$('#role').click(
+			function(){
+				department_id = $('#department').val();
+				if(department_id == ''){
+					alert('请先选择部门!');
+				}
+			}
+		);
+		$('#role2').click(
+			function(){
+				department_id = $('#department2').val();
+				if(department_id == ''){
+					alert('请先选择部门!');
+				}
+			}
+		);
+	</script>
+<include file="Public:footer" />	

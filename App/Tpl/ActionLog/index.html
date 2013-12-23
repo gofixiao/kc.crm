@@ -1,0 +1,131 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header"><h4>日志</h4></div>
+	<include file="Public:alert" />
+	<p class="view"><b>视图：</b>
+	<img src=" __PUBLIC__/img/by_owner.png"/> <a href="{:U('action_log/index')}" <if condition="$Think.get.by eq null">class="active"</if>>全部</a> |
+	<a href="{:U('action_log/index','by=me')}" <if condition="$Think.get.by eq 'me'">class="active"</if>>我的日志</a> |
+	<img src="__PUBLIC__/img/by_time.png"/> <a href="{:U('action_log/index','by=today')}" <if condition="$Think.get.by eq 'today'">class="active"</if>>今天的</a> | 
+	<a href="{:U('action_log/index','by=week')}" <if condition="$Think.get.by eq 'week'">class="active"</if>>本周的</a> | 
+	<a href="{:U('action_log/index','by=month')}" <if condition="$Think.get.by eq 'month'">class="active"</if>>本月的</a>  &nbsp; 
+	<a href="{:U('action_log/index','by=add')}" <if condition="$Think.get.by eq 'add'">class="active"</if>>最近创建</a>
+	</p>
+	<div class="row">
+		<div class="span2 knowledgecate">
+			<ul class="nav nav-list">
+				<li class="active">
+					<a href="javascript:void(0);">按日志类型查看</a>
+				</li>
+				<li><a href="{:U('action_log/index','by='.$_GET['by'])}" <if condition="$_GET['module'] eq null">class="active"</if>><i class="icon-white icon-chevron-right"></i>全部</a></li>
+				<li><a href="{:U('action_log/index','module=business&by='.$_GET['by'])}" <if condition="$_GET['module'] eq 'business'">class="active"</if>><i class="icon-chevron-right"></i>商机</a></li>
+				<li><a href="{:U('action_log/index','module=product&by='.$_GET['by'])}" <if condition="$_GET['module'] eq 'product'">class="active"</if>><i class="icon-chevron-right"></i>产品</a></li>
+				<li><a href="{:U('action_log/index','module=customer&by='.$_GET['by'])}" <if condition="$_GET['module'] eq 'customer'">class="active"</if>><i class="icon-chevron-right"></i>客户</a></li>
+				<li><a href="{:U('action_log/index','module=leads&by='.$_GET['by'])}" <if condition="$_GET['module'] eq 'leads'">class="active"</if>><i class="icon-chevron-right"></i>线索</a></li>
+			</ul>
+		</div>
+		<div class="span10">
+			<p style="font-size:14px;">
+				<b>筛选条件：</b>
+				<a <if condition="$_GET['act'] == null">class="active"</if> href="{:U('ActionLog/index','by='.$_GET['by'].'&type=1')}">全部操作</a> &nbsp; | &nbsp; 
+				<a <if condition="$_GET['act'] == 'add'">class="active"</if> href="{:U('ActionLog/index','by='.$_GET['by'].'&act=add')}">添加</a> &nbsp; | &nbsp; 
+				<a <if condition="$_GET['act'] == 'edit'">class="active"</if> href="{:U('ActionLog/index','by='.$_GET['by'].'&act=edit')}">编辑</a> &nbsp; | &nbsp; 
+				<a <if condition="$_GET['act'] == 'delete'">class="active"</if> href="{:U('ActionLog/index','by='.$_GET['by'].'&act=delete')}">删除</a> &nbsp; | &nbsp; 
+				<a <if condition="$_GET['act'] == 'completedelete'">class="active"</if> href="{:U('ActionLog/index','task&by='.$_GET['by'].'&act=completedelete')}">回收站</a> &nbsp; | &nbsp; 
+			</p>
+			<ul class="nav pull-left">		
+				<li class="pull-left"><a id="delete" class="btn" style="margin-right: 5px;"><i class="icon-remove"></i>&nbsp;删除</a> </li>
+				<li class="pull-left">
+					<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="index.php" method="get">
+						<ul class="nav pull-left">
+							<li class="pull-left">
+								&nbsp;
+								<select id="field" style="width:auto" onchange="changeCondition()" name="field">
+									<option class="word" value="content">操作人</option>
+									<option class="date" value="create_time">操作时间</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="conditionContent" class="pull-left">
+							<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+								<option value="contains">包含</option>
+								<option value="not_contain">不包含</option>
+								<option value="is">是</option>
+								<option value="isnot">不是</option>						
+								<option value="start_with">开始字符</option>
+								<option value="end_with">结束字符</option>
+								<option value="is_empty">为空</option>
+								<option value="is_not_empty">不为空</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="searchContent" class="pull-left"><input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;</li>
+							<li class="pull-left"><input type="hidden" name="m" value="action_log"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<if condition="$Think.get.act neq null"><input type="hidden" name="act" value="{$Think.get.act}"/></if>
+							<if condition="$Think.get.module neq null"><input type="hidden" name="module" value="{$Think.get.module}"/></if>
+							<button type="submit" class="btn"> <img src="__PUBLIC__/img/search.png"/>  搜索</button></li>
+						</ul>
+					</form>
+				</li>
+			</ul>
+		</div>
+		<div class="span10">
+			<form id="form1" method="post">
+			<table class="table table-hover">
+				<if condition="$list eq null">
+					<tr><td>----暂无数据！----</td></tr>
+				<else/>
+					<thead>
+						<tr>
+							<th><input id="control_all" class="control_all" type="checkbox" /></th>
+							<th>操作人</th>
+							<th>模块</th>
+							<th>内容</th>
+							<th>时间</th>
+						</tr>
+					</thead>
+					<tbody>
+						<volist name="list" id="vo">
+						<tr>
+							<td><input class="log_id" type="checkbox" name="log_id[]" value="{$vo.log_id}"/></td>
+							<td><notempty name="vo.creator.user_name"><a class="role_info" rel="{$vo.creator.role_id}" href="javascript:void(0)">{$vo.creator.user_name}</a></notempty></td>
+							<td>{$vo.module_name}</a></td>
+							<td>{$vo.content}</a></td>
+							<td>{$vo.create_time|date="Y-m-d H:i:s",###}</td>
+						</tr>
+						</volist>
+					</tbody>
+				</if>
+			</table>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(function(){
+	<if condition="$Think.get.field neq null">
+		$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+		$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+		$("#search").prop('value', '{$Think.get.search}');
+	</if>
+	$('#delete').click(function(){
+		if(confirm('你确定要删除?')){
+			$("#form1").attr('action', '{:U("log/log_delete")}');
+			$("#form1").submit();
+		}
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+})
+</script>
+<include file="Public:footer" />

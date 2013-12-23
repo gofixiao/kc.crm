@@ -1,0 +1,168 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>财务活动详情</h4>
+	</div>
+	<include file="Public:alert" />	
+	<div class="row">
+		<div class="tabbable span12">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#tab1" data-toggle="tab">基本信息</a></li>
+				<li><a href="#tab2" data-toggle="tab">相关日志({$finance['log_count']})</a></li>
+				<li><a href="#tab3" data-toggle="tab">相关附件({$finance['file_count']})</a></li>
+			</ul>
+			<div class="tab-content">
+				<div class="tab-pane active" id="tab1">
+					<table class="table table-hover">
+						<thead>
+							<tr>
+								<td>&nbsp;</td>
+								<td colspan="3">
+								<a class="btn btn-primary" href="{:U('finance/edit','id='.$finance['finance_id'])}">编辑</a>&nbsp; 
+								<a class="btn btn-primary" href="{:U('finance/delete','id='.$finance['finance_id'])}">删除</a>&nbsp; 
+								<a class="btn" type="button" onclick="javascript:history.go(-1)" >返回</a>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<th colspan="4">基本信息</th>
+							</tr>
+							<tr>
+								<td class="tdleft" width="15%"><b>财务活动名</b>:</td>
+								<td width="35%">{$finance.name}</td>
+								<td class="tdleft" width="15%"><b>审核人</b>:</td>
+								<td width="35%"><notempty name="finance.checker.user_name">{$finance.checker.user_name} ({$finance.checker.department_name} - {$finance.checker.role_name})</notempty></td>
+							</tr>
+							<tr>
+								<td class="tdleft"><b>审核状态</b>:</td>
+								<td><if condition="$finance['check_result'] eq '0'">未审核</if><if condition="$finance['check_result'] eq '1'">审核通过</if><if condition="$finance['check_result'] eq '-1'">审核拒绝</if></td>
+								<td class="tdleft"><b>类别</b>:</td>
+								<td><if condition="$finance.income_or_expenses eq -1">支出</if><if condition="$finance.income_or_expenses eq 1">收入</if></td>
+							</tr>
+							<tr>
+								<td class="tdleft"><b>应收(付)金额</b>:</td>
+								<td><if condition="$finance.plan_money neq 0">{$finance.plan_money}</if></td>
+								<td class="tdleft"><b>实收(付)金额</b>:</td>
+								<td><if condition="$finance.money neq 0">{$finance.money}</if></td>
+							</tr>
+							<tr>
+								<td class="tdleft"><b>描述</b>:</td>
+								<td colspan="3"><if condition="$finance.description neq null"><pre>{$finance.description}</pre></if></td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="tab-pane" id="tab2">
+					<table class="table">
+						<if condition="$finance.log eq null">
+							<tr>
+								<th>没有数据 </th>
+							</tr>
+						<else /> 
+							<tr>
+								<th width="20%">&nbsp;</th>
+								<th width="20%">标题</th>
+								<th width="20%">内容</th>
+								<th width="20%">创建者</th>
+								<th width="20%">创建时间</th>
+							</tr>
+							<volist name="finance.log" id="vo">
+								<tr>
+									<td class="tdleft"><a href="{:U('log/delete','r=RFinanceLog&id='.$vo['log_id'])}">删除</a> &nbsp; <a target="_blank" href="{:U('log/view','id='.$vo['log_id'])}">查看</a> &nbsp;</td>
+									<td>
+										{$vo.subject}
+									</td>
+									<td>
+										{$vo.content}
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name">{$vo.owner.user_name} [{$vo.owner.department_name}-{$vo.owner.role_name}]</notempty>
+									</td>
+									<td>
+										<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<tr>
+							<td colspan="5">
+								<a href="javascript:void(0);" id="add_log">添加</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			<div class="tab-pane" id="tab3">
+				<table class="table">
+					<if condition="$finance.file eq null">
+						<tr>
+							<th>没有数据 </th>
+						</tr>
+					<else /> 
+						<tr>
+							<th>&nbsp;</th>
+							<th>文件名</th>
+							<th>大小</th>
+							<th>添加者</th>
+							<th>添加时间</th>
+						</tr>
+						<volist name="finance.file" id="vo">
+							<tr>
+								<td class="tdleft"><a href="{:U('file/delete','r=RFileFinance&id='.$vo['file_id'])}">删除</a></td>
+								<td>
+									<a target="_blank" href="{$vo.file_path}">{$vo.name}</a>
+								</td>
+								<td>
+									{$vo.size}字节
+								</td>
+								<td>
+									<notempty name="vo.owner.user_name">{$vo.owner.user_name} [{$vo.owner.department_name}-{$vo.owner.role_name}]</notempty>
+								</td>
+								<td>
+									<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+								</td>
+							</tr>
+						</volist>
+					</if>
+					<tr>
+						<td colspan="5">
+							<a href="javascript:void(0);" id="add_file">添加</a>
+						</td>
+					</tr>
+				</table>
+			</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-file" title="添加附件">loading...</div>
+<div class="hide" id="dialog-log" title="添加日志">loading...</div>
+<script type="text/javascript">
+$("#dialog-file").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-log").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+
+$(function(){
+	$("#add_file").click(function(){
+		$('#dialog-file').dialog('open');
+		$('#dialog-file').load('{:U("file/add","r=RFileFinance&module=finance&id=".$finance["finance_id"])}');
+	});
+	$("#add_log").click(function(){
+		$('#dialog-log').dialog('open');
+		$('#dialog-log').load('{:U("log/add","r=RFinanceLog&module=finance&id=".$finance["finance_id"])}');
+	});
+});
+
+</script>
+<include file="Public:footer" />	

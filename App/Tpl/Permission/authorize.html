@@ -1,0 +1,35 @@
+<table class="table">
+	<thead>
+		<tr>
+		   <th>部门名</th>
+		   <th>岗位名</th>
+		   <th></th>
+		</tr>
+	</thead> 
+	<form action="authorize?by=permission" method="post">
+	<tfoot>
+		<tr>
+			<td>&nbsp;</td>
+			<td colspan="4">
+				<input type="hidden" name="control_id" value="{$temp}"/>
+				<input type="submit" class="btn-primary btn" value=" 保存修改 " />
+			</td>
+		</tr>
+	</tfoot>
+ 
+	<tbody>
+		<volist name="roleList" id="vo">
+		<tr>
+			<td>{$vo.name}</td>
+			<td>
+				
+				<volist name="vo.role" id="vo2">
+					<input {$vo2.checked} type="checkbox" name="roleList[]" value="{$vo2.role_id}"/>{$vo2.name} &nbsp;
+				</volist>
+
+			</td> 
+		</tr>
+		</volist>
+	</tbody>
+	</form>
+</table>

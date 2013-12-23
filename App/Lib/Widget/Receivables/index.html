@@ -1,0 +1,45 @@
+<div class="{$class}">
+	<div>
+		<h4>{$title}<small> &nbsp; <a rel="{$id}" class="update" href="javascript:void(0)" id="update_widget"><i class="icon-pencil"></i></a> &nbsp; <a href="{:U('index/widget_delete', 'id='.$id)}" id="delete_widget"><i class="icon-remove"></i></a> &nbsp; </small></h4>
+	</div>
+	<if condition="$list eq null">
+		<p>----暂无数据！----</p>
+	<else/>
+		<table class="table table-hover"> 
+			<thead>
+				<tr>
+					<th>应收款名</th>
+					<th>客户</th>
+					<th>合同编号</th>
+					<if condition="C('ismobile') neq 1">
+					<th>应收金额</th>
+					<th>应收款时间</th>
+					<th>状态</th>
+					<th>创建人</th>
+					<th>创建时间</th>
+					</if>
+				</tr>
+			</thead>
+			<tbody>			
+				<volist name="list" id="vo">
+					<tr>
+						<td>
+						<a href="{:U('finance/view','t=receivables&id='.$vo['receivables_id'])}">{$vo.name}</a>
+						</td>
+						<td>{$vo['customer_name']}</td>
+						<td>{$vo['contract_name']}</td>
+						<if condition="C('ismobile') neq 1">
+						<td>{$vo['price']}元</td>
+						<td>{$vo['pay_time']|date="Y-m-d",###}</td>
+						<td>
+							<if condition="$vo['status'] eq 2">已收款<elseif condition="$vo['status'] eq 1" />部分已收<else />未收款</if>
+						</td>
+						<td><a class="role_info" rel="{$vo.creator_role_id}" href="javascript:void(0)">{$vo['creator_name']}</a></td>
+						<td>{$vo['create_time']|date="Y-m-d",###}</td>
+						</if>
+					</tr>
+				</volist>
+			</tbody>
+		</table>
+	</if>				
+</div>

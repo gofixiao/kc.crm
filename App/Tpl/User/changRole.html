@@ -1,0 +1,71 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="page-header">
+			<select id="select1" onchange="changeContent()">
+				<option>--选择查看内容--</option>
+				<option <if condition="ACTION_NAME eq 'index' and $Think.get.status eq null">selected="selected"</if> value="1">员工列表</option>
+				<option <if condition="ACTION_NAME eq 'index' and $Think.get.status eq '0'">selected="selected"</if> value="2">待激活员工</option>
+				<option <if condition="ACTION_NAME eq 'department'">selected="selected"</if> value="4">部门管理</option>
+				<option <if condition="ACTION_NAME eq 'role'">selected="selected"</if> value="5">岗位管理</option>
+			</select>
+			
+		</div>
+		<include file="Public:alert" />
+		<form action="{:U('user/role_delete')}" method="post">
+		<div class="row">
+			<div class="span12">
+				<div class="bulk-actions align-left">
+					<ul class="nav pull-left">					
+						<li class="dropdown">
+							<a href="#" class="btn dropdown-toggle" data-toggle="dropdown">按部门查看岗位<b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a href="javascript:void(0);" class="link" onclick="window.location='{:U('user/role')}'">--全部--</a></li>
+								<volist name="departmentList" id="vo">
+									<li><a href="javascript:void(0);" class="link" onclick="window.location='{:U('user/role')}?department_id={$vo.department_id}'">{$vo.name}</a></li>
+								</volist>
+							</ul>
+						</li> 
+					</ul>
+					&nbsp; <input type="submit" class="btn" value="删除"/>
+					<div class="pull-right">
+						<a  class="btn btn-primary" href="{:U('user/add')}">添加员工</a>
+						&nbsp; <a id="add_department" class="btn btn-primary">添加部门</a>
+						&nbsp; <a id="add_role" class="btn btn-primary">添加岗位</a>
+					</div>
+				</div>
+			</div>
+			<div class="span12">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+						   <th><input class="check_all" id="check_all" type="checkbox" /></th>
+						   <th>岗位名</th>
+						   <th>隶属部门</th>
+						   <th>员工</th>
+						   <th>描述</th>
+						   <th>操作</th>
+						</tr>
+					</thead>
+				 
+					<tbody>
+						<volist name="roleList" id="vo">
+						<tr>
+							<td><input type="checkbox" class="check_list" name="roleList[]" value="{$vo.role_id}"/></td>
+							<td >{$vo.name}</td>
+							<td >{$vo.department.name}</td>
+							<td><if condition="$vo['user']['name']">{$vo.user.name}<else /><code>空缺</code></if></td>
+							<td>{$vo.description}</td>
+							<td>
+								<a rel="{$vo.role_id}" href="javascript:void(0);" class="edit">编辑</a>&nbsp;
+								<a rel="{$vo.role_id}" href="javascript:void(0);" class="permission">分配权限</a>&nbsp;
+								<a rel="{$vo.role_id}" href="javascript:void(0);" class="user">分配员工</a>
+							</td>
+						</tr>
+						</volist>
+					</tbody>
+				</table>
+			</div> <!-- End #tab1 -->
+		</div>
+		</form>
+	</div>
+<include file="Public:footer" />

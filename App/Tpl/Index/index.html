@@ -1,0 +1,103 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h3><img style="height:30px;" src="__PUBLIC__/img/working_platform.png"/> &nbsp;<span>{$Think.session.name}的工作台 <a id="add" class="btn btn-primary pull-right" ><i class="icon-plus"></i>&nbsp; 添加组件</a></span></h3>	
+	</div>
+	<include file="Public:alert" />	
+	
+	<div class="row" id="widgets">
+        <empty name="widget">
+		<div class="span12">
+            <div class="pull-left row">
+        </empty>
+            <div class="<empty name="widget">span9<else />span12</empty>">
+                <notempty name="announcement_list">
+                
+                    <h4><img src="__PUBLIC__/img/index_notice.png" style="width:17.5px;"/> 系统公告</h4>
+                    <div style="padding:10px;font-size: 12px;" class="hero-unit">
+                    <volist name="announcement_list" id="vo" key="k">
+                        <p>{$k}、<span style="font-size: 14px;color:#{$vo.color}">{$vo.title}</span> <if condition="(time()-$vo['update_time']) lt 86400*7"> &nbsp; <img src="./Public/img/new.gif"></if> &nbsp; (更新时间：{$vo.update_time|date="Y-m-d H:i",###})
+                        <a rel="{$vo['announcement_id']}" href="javascript:void(0);" id="show{$vo['announcement_id']}" style="text-decoration: none;" class="pull-right" onclick="javascript:show({$vo['announcement_id']});"><i class="icon-search"></i> 查看详情</a>
+                        <a rel="{$vo['announcement_id']}" href="javascript:void(0);" id="unshow{$vo['announcement_id']}" style="text-decoration: none;" class="pull-right hide"  onclick="javascript:unshow({$vo['announcement_id']});"><i class="icon-chevron-up"></i> 收起详情</a></p>
+                        <p><div id="detail{$vo['announcement_id']}" class="hide">{$vo.content}</div></p>
+                    </volist>
+                    </div>
+                </notempty>
+                <h3 style="color:#666666;">欢迎使用悟空CRM!</h3>
+            </div>
+        <empty name="widget">
+            </div>
+            <div class="pull-right row">
+                <img style="width:200px;" src="__PUBLIC__/img/d_w.png">
+            </div>
+        </div>
+        </empty>
+		<empty name="widget">
+            {:W('Welcome')}
+		<else />
+            
+			<volist name="widget" id="vo">
+			{:W($vo['widget'], $vo)}
+			</volist>
+		</empty>
+	
+</div>
+<div id="dialog-message" class="hide" title="添加面板组件">loading...</div>
+<div id="dialog-message2" class="hide" title="修改面板组件">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+$('#dialog-message').dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position :["center",100]
+});
+
+$('#dialog-message2').dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position :["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+function show(id){
+	$("#detail"+id).show();
+	$("#show"+id).hide();
+	$("#unshow"+id).show();
+}
+function unshow(id){
+	$("#detail"+id).hide();
+	$("#unshow"+id).hide();
+	$("#show"+id).show();
+}
+$(function(){
+	$("#add").click(
+		function(){
+			$('#dialog-message').dialog('open');
+			$('#dialog-message').load('{:U("index/widget_add")}');
+		}
+	);
+	$(".update").click(
+		function(){
+			id = $(this).attr('rel');
+			$('#dialog-message2').dialog('open');
+			$('#dialog-message2').load("{:U('index/widget_edit','id=')}"+id);
+		}
+	);
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	
+});
+</script>
+<include file="Public:footer" />

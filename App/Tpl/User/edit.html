@@ -1,0 +1,145 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<h4>用户信息</h4>
+	</div>
+	<div class="row">
+		<div class="span12">
+			<include file="Public:alert" />
+		</div>
+		<div class="span12">
+			<form class="form-horizontal" action="{:U('user/edit')}" method="post" >
+				<input type="hidden" name="user_id" value="{$user.user_id}"/>
+				<table class="table span7">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input class="btn" type="button" onclick="javascript:history.go(-1)" value="取消"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td>&nbsp;</td>
+							<td><input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;<input class="btn" type="button" onclick="javascript:history.go(-1)" value="取消"/></td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<tr>
+							<th colspan="2">基本信息</th>
+						</tr>
+						<tr>
+							<td class="tdleft">员工名</td>
+							<td><if condition="session('?admin')"><input type="text" name="name" value="{$user['user_name']}"><else />{$user.user_name}</if></td>
+						</tr>
+						<tr>
+							<td class="tdleft">修改密码请输入：</td>
+							<td><input class="text-input small-input" type="password" name="password" id="password" value=""/></td>
+						</tr>
+						<tr>
+							<td class="tdleft">员工类别</td>
+							<td><if condition="session('?admin')"><select name="category_id" id="category_id"><volist name="categoryList" id="temp"><option value="{$temp.category_id}" <if condition="$temp.category_id eq $user['category_id']">selected = "selected"</if>>{$temp.name}</option></volist></select><else />{$user.category}</if></td>
+						</tr>
+						<if condition="session('?admin')">
+							<tr>
+								<td class="tdleft">部门&nbsp;<span style="color:red;">*</span></td>  
+								<td>
+									<select id="department" name="department_id" onchange="changeRoleContent()">
+										<option value=""></option>
+										<volist name="department_list" id="temp">
+											<option value="{$temp.department_id}">{$temp.name}</option>
+										</volist>
+									</select>
+								</td>
+							</tr>
+							<tr>
+								<td class="tdleft">岗位&nbsp;<span style="color:red;">*</span></td>  
+								<td>
+									<select id="role" name="position_id">
+										<option value=""></option>
+										<volist name="position_list" id="temp">
+											<option value="{$temp.position_id}">{$temp.name}</option>
+										</volist>
+									</select>
+									
+								</td>
+							</tr>
+						</if>
+						<tr>
+							<td class="tdleft">性别</td>
+							<td><input type="radio"  name="sex" value="1" <if condition="$user['sex'] eq 1">checked="checked"</if>/>男 
+							<input type="radio"  name="sex" value="2" <if condition="$user['sex'] eq 2">checked="checked"</if>/>女</td>
+						</tr>
+						<tr>
+							<td class="tdleft">邮箱&nbsp;<span style="color:red;">*</span></td>
+							<td><input class="text-input small-input" name="email" type="text" value="{$user.email}"></td>
+						</tr>
+						<tr>
+							<td class="tdleft">手机&nbsp;<span style="color:red;">*</span></td>
+							<td><input class="text-input small-input" name="telephone" type="text" value="{$user.telephone}"></td>
+						</tr>
+						<tr>
+							<td class="tdleft">联系地址</td>
+							<td><textarea name="address" >{$user.address}</textarea></td>
+						</tr>
+						<tr>
+							<th colspan="2">账号绑定信息</th>
+						</tr>
+						<tr>
+							<td class="tdleft">微信绑定</td>
+							<td><if condition="$user[weixinid]">已绑定，微信id：{$user.weixinid}<else />未绑定<a href="javascript:void(0);" id="weixin">点击扫描二维码</a></if></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>			
+		</div> <!-- End #tab1 -->		
+	</div> <!-- End #main-content -->	
+</div>
+<div class="hide" id="dialog-weixin" title="扫描二维码">loading...</div>
+<script type="text/javascript">
+$("#dialog-weixin").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	Height: 600,
+	position: ["center",100]
+});
+function changeRoleContent(){
+	department_id = $('#department').val();
+	if(department_id == ''){
+		$("#role").html('');
+	}else{
+		$.ajax({
+			type:'get',
+			url:'index.php?m=user&a=getpositionlist&id='+department_id,
+			async:false,
+			success:function(data){
+				options = '';
+				$.each(data.data, function(k, v){
+					options += '<option value="'+v.position_id+'">'+v.name+'</option>';
+				});
+				$("#role").html(options);
+			},
+			dataType:'json'
+		});		
+	}
+}
+$('#role').click(
+	function(){
+		department_id = $('#department').val();
+		if(department_id == ''){
+			alert('请先选择部门!');
+		}
+	}
+);
+$(function(){
+	$("#weixin").click(function(){
+		$('#dialog-weixin').dialog('open');
+		$('#dialog-weixin').load('{:U("user/weixin")}');
+	});
+	
+	$("#department option[value='{$user['department_id']}']").prop("selected", true);
+	$("#role option[value='{$user['position_id']}']").prop("selected", true);
+});
+</script>
+<include file="Public:footer" />	

@@ -1,0 +1,35 @@
+<form class="form-horizontal" action="{:U('setting/statusflowadd')}" method="post">
+	<input type="hidden" name="status_id" value="{$status.status_id}"/>
+	<table class="table">
+		<tr>
+			<th colspan="2">基本信息</th>
+		</tr>
+		<tr>
+			<td width="20%" class="tdleft">名称：</td>
+			<td><input type="text" name="name" class="span3"/></td>
+		</tr>
+		<tr>
+			<td width="20%" class="tdleft">状态流内容：</td>
+			<td><p id="attachment1">
+					<select name="status[]">
+						<volist name="statusList" id="vo"><option value="{$vo.name}">{$vo.name}</option></volist>
+					</select></p> 
+					<a id="add_status" href="javascript:add_status(1);">增加一个状态</a></td>
+		</tr>
+		<tr>
+			<td class="tdleft">状态流描述：</td>
+			<td><textarea class="span4" rows="4" name="description"></textarea></td>
+		</tr>
+		<tr>
+			<td>&nbsp;</td>
+			<td><input class="btn btn-primary" type="submit" value="保存"/> &nbsp;
+			<input class="btn" type="button" onclick="javascript:$('#dialog-add').dialog('close');" value="取消"/></td>
+		</tr>
+	</table>
+</form>
+<script type="text/javascript">
+function add_status(id) {
+	$("#add_status").before('<p id="attachment' + id + '"><select name="status[]"><volist name="statusList" id="vo"><option value="{$vo.name}">{$vo.name}</option></volist></select> <a href=\'javascript:$("#attachment' + id + '").remove();\'>删除</a></p>');
+	$("#add_status").attr('href', 'javascript:add_status(' + (id+1) + ');');
+}
+</script>

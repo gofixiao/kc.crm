@@ -1,0 +1,218 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div style="margin-top:10px; font-size:14px;">
+		<ul class="nav nav-tabs">
+		  <li class="active">
+			<a href="{:U('task/index')}"><img src="__PUBLIC__/img/task_checked2.png"/>&nbsp; 任务</a>
+		  </li>
+		  <li><a href="{:U('task/analytics')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp;统计</a></li>
+		  <li><a href="http://5kcrm.com/index.php?m=doc&a=index&id=14" target="_blank" style="font-size: 12px;color: rgb(255, 102, 0);"><img width="20px;" src="__PUBLIC__/img/help.png"/> 帮助</a></li>
+		</ul>
+	</div>
+	<include file="Public:alert" />
+	<p class="view"><b>视图：</b>
+	<img src=" __PUBLIC__/img/by_owner.png"/> <a href="{:U('task/index')}" <if condition="$Think.get.by eq null">class="active"</if>>全部</a> |
+	<a href="{:U('task/index','by=me')}" <if condition="$Think.get.by eq 'me'">class="active"</if>>我的任务</a> |
+	<a href="{:U('task/index','by=sub')}" <if condition="$Think.get.by eq 'sub'">class="active"</if>>下属任务</a> | 
+	<a href="{:U('task/index','by=create')}" <if condition="$Think.get.by eq 'create'">class="active"</if>>我分配的任务</a>  &nbsp;  &nbsp; 
+	<img src=" __PUBLIC__/img/by_status.png"/> <a href="{:U('task/index','by=s1')}" <if condition="$Think.get.by eq 's1'">class="active"</if>>未启动</a> | 	
+	<a href="{:U('task/index','by=s2')}" <if condition="$Think.get.by eq 's2'">class="active"</if>>推迟</a> | 	
+	<a href="{:U('task/index','by=s3')}" <if condition="$Think.get.by eq 's3'">class="active"</if>>进行中</a> | 	
+	<a href="{:U('task/index','by=s4')}" <if condition="$Think.get.by eq 's4'">class="active"</if>>已完成</a> | 	
+	<a href="{:U('task/index','by=closed')}" <if condition="$Think.get.by eq 'closed'">class="active"</if>>关闭的</a>  &nbsp;  &nbsp; 
+	<img src="__PUBLIC__/img/by_time.png"/> <a href="{:U('task/index','by=today')}" <if condition="$Think.get.by eq 'today'">class="active"</if>>今日截止</a> | 
+	<a href="{:U('task/index','by=week')}" <if condition="$Think.get.by eq 'week'">class="active"</if>>本周截止</a> | 
+	<a href="{:U('task/index','by=month')}" <if condition="$Think.get.by eq 'month'">class="active"</if>>本月截止</a> |
+	<a href="{:U('task/index','by=add')}" <if condition="$Think.get.by eq 'add'">class="active"</if>>最近分配</a> | 
+	<a href="{:U('task/index','by=update')}" <if condition="$Think.get.by eq 'update'">class="active"</if>>最近更新</a> &nbsp;  &nbsp; 
+	<a href="{:U('task/index','by=deleted')}" <if condition="$Think.get.by eq 'deleted'">class="active"</if>><img src="__PUBLIC__/img/task_garbage.png"/> 回收站</a> &nbsp;  &nbsp; 
+	</p>
+	<div class="row"> 
+		
+		<div class="span12" style="height:36px;">
+			<ul class="nav pull-left">
+				<li class="pull-left"><if condition="session('?admin') or $Think.get.by neq 'deleted'"><a id="delete"  class="btn"><i class="icon-remove"></i>&nbsp;删除</a></if>&nbsp; </li>
+				<li class="pull-left">
+				<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="" method="get">
+					<ul class="nav pull-left">
+					<li class="pull-left">&nbsp; 
+						<select id="field" style="width:auto" onchange="changeCondition()" name="field">
+							<option class="all" value="all">任意字段</option>
+							<option class="word" value="subject">任务主题</option>
+							<option class="role" value="owner_role_id">执行人</option>
+							<option class="role" value="creator_role_id">创建人</option>
+							<option class="task_status" value="status">任务状态</option>
+							<option class="task_priority" value="priority">优先级</option>
+							<option class="word" value="description">描述</option>
+							<option class="date" value="due_date">截止日期</option>
+							<option class="date" value="create_date">创建日期</option>
+							<option class="date" value="update_date">更新日期</option>
+						</select>&nbsp;&nbsp;
+					</li>
+					<li id="conditionContent" class="pull-left">
+						<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+							<option value="contains">包含</option>
+							<option value="is">是</option>
+							<option value="start_with">开始字符</option>
+							<option value="end_with">结束字符</option>
+							<option value="is_empty">为空</option>
+						</select>&nbsp;&nbsp;
+					</li>
+					<li id="searchContent" class="pull-left">
+						<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+					</li>
+					<li class="pull-left">
+						<input type="hidden" name="m" value="Task"/>
+						<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+						<input type="submit" class="btn" value="搜索"/>
+					</li></ul>
+				</form>
+				</li>
+			</ul>
+			<div class="pull-right">
+				<a href="{:U('task/add')}" class="btn btn-primary"><i class="icon-plus"></i>&nbsp; 新建任务</a>&nbsp;
+				<div class="btn-group">
+					<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"> <i class="icon-wrench"></i>&nbsp; 任务工具<span class="caret"></span></button>
+					<ul class="dropdown-menu">
+						<!--<li><a href="javascript:return(0);" id="import_excel"  class="link">导入任务</a></li>-->
+						<li><a href="{:U('task/excelexport')}"  onclick="return window.confirm(&quot;您确定要导出任务吗 ?&quot;);" class="link"><i class="icon-download"></i> 导出任务</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="span12">
+			<form id="form1" action="" method="post">
+				<table class="table table-hover">
+					<empty name="task_list">
+						<tr><td>----暂无数据！----</td></tr>
+					<else />
+						<thead>
+							<tr>
+								<th><input type="checkbox" id="control_all" name="control_all"/></th>
+								<th width="20px">&nbsp;</th>
+								<th>主题</th>
+								<th>关联信息</th>
+								<th>执行人</th>	
+								<if condition="C('ismobile') neq 1">
+								<th>状态</th>
+								<th>优先级</th></if>
+								<if condition="C('ismobile') neq 1 and $Think.get.by eq 'deleted'">
+									<th>删除人</th>
+									<th>删除时间</th>
+								<elseif condition="C('ismobile') neq 1" />
+									<th>创建人</th>
+									<th>截止时间</th>
+								</if>
+								<th>操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr><td colspan="9">
+								<p>注： <img src="__PUBLIC__/img/task_owner.png"/> 我负责的 &nbsp; <img src="__PUBLIC__/img/task_creator.png"/>我分配的 &nbsp; </p>{$page}
+							</td></tr>
+						</tfoot>
+						<tbody>
+							<volist name="task_list" id="vo">
+								<tr>
+									<td>
+										<input name="task_id[]" class="check_list" type="checkbox" value="{$vo.task_id}"/>
+									</td>
+									<td>
+										<if condition="session('role_id') eq $vo['owner_role_id'] "><img src="__PUBLIC__/img/task_owner.png"/><elseif condition="session('role_id') eq $vo['creator_role_id'] "/><img src="__PUBLIC__/img/task_creator.png"/></if>
+									</td>
+									<td><a href="{:U('task/view','id='.$vo['task_id'])}">{$vo.subject}</a></td>
+									<td>{$vo.module.module_name} {$vo.module.name}</td>
+									<td><notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty></td>
+									<if condition="C('ismobile') neq 1">
+									<td>{$vo.status}</td>
+									<td>{$vo.priority}</td></if>
+									<if condition="C('ismobile') neq 1 and $Think.get.by eq 'deleted'">
+										<td><notempty name="vo.deletor.user_name"><a class="role_info" rel="{$vo.deletor.role_id}" href="javascript:void(0)">{$vo.deletor.user_name}</a></notempty></td>
+										<td><notempty name="vo.delete_time">{$vo.delete_time|date="Y-m-d H:i",###}</notempty></td>
+									<elseif condition="C('ismobile') neq 1" />
+										<td><notempty name="vo.creator.user_name"><a class="role_info" rel="{$vo.creator.role_id}" href="javascript:void(0)">{$vo.creator.user_name}</a></notempty></td>
+										<td>
+										<?php if($vo['due_date'] <= 0){ ?>
+										<?php }elseif ($vo['diff_days'] > 0) { ?><img src="__PUBLIC__/img/task_mtime.png"/> 还有{$vo['diff_days']}天
+										<?php } elseif($vo['diff_days'] < 0) { ?>
+										<img width="12px" src="__PUBLIC__/img/task_alert.png"/>&nbsp;&nbsp;<span style="color:red;">超期<?php echo abs($vo['diff_days']) ?>天</span>
+										<?php } else{ ?><img src="__PUBLIC__/img/task_ltime.png"/>&nbsp;<span style="color:rgb(255, 0, 224);">今天完成</span>
+										<?php } ?>
+										</td>
+									</if>
+									
+									
+									<td>
+										<a href="{:U('task/view','id='.$vo['task_id'])}">查看</a>&nbsp;
+										<if condition="$Think.get.by neq 'deleted'">
+											<a href="{:U('task/edit','id='.$vo['task_id'])}">编辑</a>
+										<else />
+											<a href="{:U('task/revert','id='.$vo['task_id'])}" title="还原">还原</a>
+										</if>
+										<if condition="$vo['isclose'] eq 0 and $Think.get.by neq 'deleted' and $vo['creator']['role_id'] eq $_SESSION['role_id']"><a href="{:U('task/close','id='.$vo['task_id'])}">关闭 &nbsp;</a><elseif condition="$Think.get.by neq 'deleted' and $vo['isclose'] eq 1" />已关闭 &nbsp;</if>
+									</td>
+								</tr>
+							</volist>
+						</tbody>
+					</empty>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-import").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+function changeContent(){
+	a = $("#select1  option:selected").val();
+	window.location.href="{:U('task/index','by=')}"+a;
+}
+
+$(function(){
+<if condition="$Think.get.field neq null">
+	$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+	$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+	$("#search").prop('value', '{$Think.get.search}');
+</if>
+	$("#control_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+	$('#delete').click(function(){
+		if(confirm('你确定要删除?')){
+		<if condition="$Think.session.admin eq 1 and $Think.get.by eq 'deleted'">
+			$("#form1").attr('action', '{:U("task/completedelete")}');
+			$("#form1").submit();
+		<else />
+			$("#form1").attr('action', '{:U("task/delete")}');
+			$("#form1").submit();
+		</if>
+		}
+	});
+	$("#import_excel").click(function(){
+		$('#dialog-import').dialog('open');
+		$('#dialog-import').load('{:U("task/excelimport")}');
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+});
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,166 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<h4>日程</h4>
+	</div>
+	<include file="Public:alert" />
+	<p class="view"><b>视图：</b>
+	<img src=" __PUBLIC__/img/by_owner.png"/>  <a href="{:U('event/index')}" <if condition="$Think.get.by eq null">class="active"</if>>全部</a> |
+	<a href="{:U('event/index','by=me')}" <if condition="$Think.get.by eq 'me'">class="active"</if>>我负责的</a> |
+	<a href="{:U('event/index','by=sub')}" <if condition="$Think.get.by eq 'sub'">class="active"</if>>下属负责的</a> | 
+	<a href="{:U('event/index','by=create')}" <if condition="$Think.get.by eq 'create'">class="active"</if>>我创建的</a> &nbsp; &nbsp; &nbsp; &nbsp;
+	<img src="__PUBLIC__/img/by_time.png"/> 
+	<a href="{:U('event/index','by=today')}" <if condition="$Think.get.by eq 'today'">class="active"</if>>今日日程</a> | 
+	<a href="{:U('event/index','by=week')}" <if condition="$Think.get.by eq 'week'">class="active"</if>>本周日程</a> | 
+	<a href="{:U('event/index','by=month')}" <if condition="$Think.get.by eq 'month'">class="active"</if>>本月日程</a> &nbsp; &nbsp; 
+	<a href="{:U('event/index','by=add')}" <if condition="$Think.get.by eq 'add'">class="active"</if>>最近创建</a> | 
+	<a href="{:U('event/index','by=update')}" <if condition="$Think.get.by eq 'update'">class="active"</if>>最近更新</a>
+	</p>
+	<div class="row">
+		<div class="span12">
+			<ul class="nav pull-left">
+				<li class="pull-left"><a id="delete"  class="btn" style="margin-right: 5px;"><i class="icon-remove"></i>删除</a></li>
+				<li class="pull-left">
+					<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="" method="get">
+					<ul class="nav pull-left">
+						<li class="pull-left">
+							&nbsp;&nbsp;
+							<select style="width:auto" name="field" id="field" onchange="changeCondition()">
+								<option class="all" value="all">任意字段</option>
+								<option class="word" value="subject">标题</option>
+								<option class="word" value="description">内容</option>
+								<option class="role" value="owner_role_id">负责人</option>
+								<option class="date" value="start_date">开始时间</option>
+								<option class="date" value="end_date">结束时间</option>
+								<option class="date" value="create_date">创建时间</option>
+								<option class="date" value="update_date">修改时间</option>
+							</select>&nbsp;&nbsp;
+						</li>
+						<li id="conditionContent" class="pull-left">
+						<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">					
+								<option value="contains">包含</option>
+								<option value="is">是</option>
+								<option value="start_with">开始字符</option>
+								<option value="end_with">结束字符</option>
+								<option value="is_empty">为空</option>
+							</select>&nbsp;&nbsp;
+						</li>
+						<li id="searchContent" class="pull-left">
+							<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+						</li>
+						<li class="pull-left">
+							<input type="hidden" name="m" value="Event"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<button type="submit" class="btn"> <img src="__PUBLIC__/img/search.png"/>  搜索</button>
+						</li>
+					</ul>
+					</form>
+				</li>
+			</ul>
+			<div class="pull-right">
+				<a href="{:U('event/add')}" class="btn btn-primary"><i class="icon-plus"></i> &nbsp;新建日程</a>&nbsp;
+				<div class="btn-group">
+					<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="icon-wrench"></i>  &nbsp;日程工具<span class="caret"></span></button>
+					<ul class="dropdown-menu">
+						<!--<li><a href="javascript:return(0);" id="import_excel"  class="link">导入日程</a></li>-->
+						<li><a href="{:U('event/excelexport')}"  onclick="return window.confirm(&quot;您确定要导出日程吗 ?&quot;);" class="link"><i class="icon-download"></i>&nbsp;导出日程</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div class="span12">
+			<form id="form1" method="post">
+				<table class="table table-hover"> 
+					<if condition="$eventlist eq null">
+						<tr><td>----暂无数据！----</td></tr>
+					<else/>
+					<thead> 
+						<tr>
+							<th><input type="checkbox" name="check_all" id="check_all"/></th>
+							<th>主题</th>
+							<if condition="C('ismobile') neq 1">
+							<th>起始日期时间</th> 
+							<th>结束日期时间</th>
+							</if>
+							<th>日程地点</th>
+							<th>负责人</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr><td colspan="7">{$page}</td></tr>
+					</tfoot>
+					<tbody>
+						<volist name="eventlist" id="vo">
+							<tr>
+								<td>
+									<input name="event_id[]" class="check_list" type="checkbox" value="{$vo.event_id}"/>
+								</td>
+								<td><a href="{:U('event/view', 'id='.$vo['event_id'])}">{$vo.subject}</a></td>
+								<if condition="C('ismobile') neq 1">
+								<td><notempty name="vo.start_date">{$vo.start_date|date="Y-m-d",###}</notempty></td>
+								<td><notempty name="vo.end_date">{$vo.end_date|date="Y-m-d",###}</notempty></td>
+								</if>
+								<td>{$vo.venue}</td>
+								<td><notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty></td>
+								<td> <a href="{:U('event/view', 'id='.$vo['event_id'])}">查看</a> &nbsp;
+									<a href="{:U('event/edit', 'id='.$vo['event_id'])}">编辑</a></td>
+							</tr>
+						</volist>
+					</tbody>
+					</if>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-import").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+function changeContent(){
+	a = $("#select1  option:selected").val();
+	window.location.href="{:U('event/index', 'by=')}"+a;
+}
+$(function(){
+<if condition="$Think.get.field neq null">
+	$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+	$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+	$("#search").prop('value', '{$Think.get.search}');
+</if>
+	$("#check_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+	$('#delete').click(function(){
+		if(confirm('确认删除吗？')){
+			$("#form1").attr('action', '{:U("event/delete")}');
+			$("#form1").submit();
+		}
+	});
+	$("#import_excel").click(function(){
+		$('#dialog-import').dialog('open');
+		$('#dialog-import').load('{:U("event/excelimport")}');
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+})
+</script>
+<include file="Public:footer" />

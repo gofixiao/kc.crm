@@ -1,0 +1,113 @@
+<include file="Public:header" />
+<style>
+table tbody tr{cursor:move;}
+</style>
+<div class="container">
+	<div class="page-header">
+		<h4>短信模板设置</h4>
+	</div>
+	<include file="Public:alert" />
+	<div class="row">
+		<form action="{:U('sms/delete')}" id="form1" method="post">
+			<div class="span12">
+				<p><div class="bulk-actions align-left">
+					<a class="btn" href="javascript:void(0);" id="btn_delete"/><i class="icon-remove"></i> 删除</a> &nbsp; <a class="btn" id="sort_btn"><i class="icon-file"></i> 保存顺序</a>
+					<div class="pull-right">
+						<a href="javascript:void(0);" id="add" class="btn btn-primary"><i class="icon-plus"></i> 添加短信模板</a>
+					</div>
+				</div></p>
+			</div>
+			<div class="span12">
+				<table class="table table-hover" width="95%" border="0" cellspacing="1" cellpadding="0">
+					<notempty name="templateList">
+						<thead>
+							<tr>
+								<th width="10%"><input type="checkbox" name="check_all" id="check_all" class="check_all"/> &nbsp;</th>
+								<th width="20%">模板主题</th>
+								<th width="50%">内容</th>
+								<th width="20%">操作</th>
+							</tr>
+						</thead>
+						<tfoot>
+							<tr>
+								<td colspan="6">
+									<div class="span8"><span style="color: rgb(243, 40, 12);">*提示：拖动可改变状态顺序</span></div>
+								</td>
+							</tr>
+						</tfoot>
+						<tbody>
+							<volist name="templateList" id="vo">
+								<tr>
+									<td><input type="checkbox" class="list" name="template_id[]" value="{$vo.template_id}"/>
+									</td>
+									<td>{$vo.subject}</td>
+									<td>{$vo.content}</td>
+									<td><a href="javascript:void(0);" rel="{$vo['template_id']}" class="edit">编辑</a></td>
+								</tr>
+							</volist>
+						</tbody>
+					<else />
+						<tr>
+							<td>----暂无数据！----</td>
+						</tr>
+					</notempty>
+				</table>
+			</div> 
+		</form>
+	</div>
+<div class="hide" id="dialog-add" title="添加状态">loading...</div>
+<div class="hide" id="dialog-edit" title="修改状态">loading...</div>
+<div class="hide" id="dialog-delete" title="删除状态">loading...</div>
+</div>
+<script type="text/javascript">	
+$("#dialog-add").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-edit").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+
+$("table tbody").sortable({connectWith: "table tbody"});
+
+$(function(){
+	$("#btn_delete").click(function(){
+		if(confirm("确认删除吗？操作后将不可恢复!")){
+			$('#form1').submit();
+		}
+	});
+	$("#check_all").click(function(){
+		$("input[class='list']").prop('checked', $(this).prop("checked"));
+	});
+	$("#add").click(function(){
+		$('#dialog-add').dialog('open');
+		$('#dialog-add').load('{:U("sms/add")}');
+	});
+	$(".edit").click(function(){
+		var id = $(this).attr('rel');
+		$('#dialog-edit').dialog('open');
+		$('#dialog-edit').load('{:U("sms/edit","id")}'+id);
+	});
+	$("#sort_btn").click(
+		function() {
+			position = [];
+			$.each($(".list"), function(i, item){position.push(item.value)});
+			$.get('{:U("sms/ordersort")}',{postion:position.join(',')}, function(data){
+				if (data.status == 1) {
+					$(".page-header").after('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">×</button>' + data.info + '</div>');
+				} else {
+					$(".page-header").after('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">×</button>' + data.info + '</div>');
+				}
+			}, 'json');
+		}	
+	);
+})
+</script>
+<include file="Public:footer" />

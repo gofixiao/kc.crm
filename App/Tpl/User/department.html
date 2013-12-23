@@ -1,0 +1,198 @@
+<include file="Public:header" />
+	<link rel="stylesheet" href="__PUBLIC__/css/treeview/jquery.treeview.css" type="text/css">
+	<script type="text/javascript" src="__PUBLIC__/js/treeview/jquery.treeview.js"></script>
+	<script type="text/javascript" src="__PUBLIC__/js/treeview/jquery.treeview.edit.js"></script>
+	
+	<script type="text/javascript">
+		$(function() {
+			$("#browser").treeview();
+			$("#add").click(function() {
+				var branches = $("<li><span class='folder'>New Sublist</span><ul>" +
+					"<li><span class='file'>Item1</span></li>" +
+					"<li><span class='file'>Item2</span></li></ul></li>").appendTo("#browser");
+				$("#browser").treeview({
+					add: branches
+				});
+				branches = $("<li class='closed'><span class='folder'>New Sublist</span><ul><li><span class='file'>Item1</span></li><li><span class='file'>Item2</span></li></ul></li>").prependTo("#folder21");
+				$("#browser").treeview({
+					add: branches
+				});
+			});
+		})
+	</script>
+	
+	<style type="text/css">
+.ztree li span.button.add {margin-left:2px; margin-right: -1px; background-position:-144px 0; vertical-align:top; *vertical-align:middle}
+	</style>
+	<div class="container">
+		<div class="page-header">
+			<p class="view">
+			<h4>组织架构 -
+				<small>
+				<a href="{:U('user/department')}" <if condition="ACTION_NAME eq 'department' or ACTION_NAME eq 'role'">class="active"</if>>组织结构</a> | 	
+				<a href="{:U('user/index','status=1')}" <if condition="ACTION_NAME eq 'index' and $Think.get.status neq '0'">class="active"</if>>用户管理</a> | 
+				<a href="{:U('user/index', 'status=0')}" <if condition="ACTION_NAME eq 'index' and $Think.get.status eq '0'">class="active"</if>>待激活用户</a>
+				</small></h4>
+			</p>
+		</div>
+		<include file="Public:alert" />
+		<div class="row">
+			<form action="{:U('user/department_delete')}" method="post" onsubmit="return confirm('确认删除吗？')">
+			<div class="span12">
+				<div class="bulk-actions align-left">
+					<a href="{:U('user/department')}" <if condition="ACTION_NAME eq 'department'">class="active"</if>>部门岗位图</a> | 
+					<a href="{:U('user/role')}" <if condition="ACTION_NAME eq 'role'">class="active"</if>>上下级关系图</a>
+					<div class="pull-right">
+						<a class="btn btn-primary" href="{:U('user/add')}"><i class="icon-plus"></i>&nbsp; 添加员工</a>
+						<if condition="session('?admin')">&nbsp; <a id="add_department" class="btn btn-primary"><i class="icon-plus"></i>&nbsp; 添加部门</a></if>
+						&nbsp; <a id="add_role" class="btn btn-primary"><i class="icon-plus"></i>&nbsp; 添加岗位</a>
+					</div>
+				</div>
+			</div>
+			<div class="span12">
+				{$tree_code}
+			</div>
+		</div>
+	</div>
+	<div id="dialog-message1" class="hide" title="修改部门信息">loading...</div>	
+	<div id="dialog-message4" class="hide" title="修改岗位信息">loading...</div>	
+	<div id="dialog-message2" class="hide" title="添加部门">loading...</div>	
+	<div id="dialog-message3" class="hide" title="添加岗位">loading...</div>
+<script type="text/javascript">
+	$(function(){
+		$(".treeview .file").hover(function(){
+			rel = $(this).attr('rel');
+			$('#control_file' + rel).show();
+		},function(){
+			rel = $(this).attr('rel');
+			$('#control_file' + rel).hide();
+		});
+		$(".treeview .folder").hover(function(){
+			rel = $(this).attr('rel');
+			$('#control_folder' + rel).show();
+		},function(){
+			rel = $(this).attr('rel');
+			$('#control_folder' + rel).hide();
+		});
+		$("#add_department").click(function(){
+			$('#dialog-message2').dialog('open');$('#dialog-message2').load('{:U("user/department_add")}');
+		});
+		$("#add_role").click(function(){
+			$('#dialog-message3').dialog('open');$('#dialog-message3').load('{:U("user/role_add")}');
+		});
+		$(".department_edit").click(function(){
+			$('#dialog-message1').dialog('open');
+			id = $(this).attr('rel');
+			$('#dialog-message1').load('{:U("user/department_edit","id=")}'+id);
+		});
+		$(".position_edit").click(function(){
+			$('#dialog-message4').dialog('open');
+			id = $(this).attr('rel');
+			$('#dialog-message4').load('{:U("user/role_edit","id=")}'+id);
+		});
+		$(".department_delete").click(function(){
+			if(confirm("确定删除该部门吗?")){
+				id = $(this).attr('rel');
+				window.location="{:U('user/department_delete','id=')}"+id;
+			}
+		});
+		$(".position_delete").click(function(){
+			if(confirm("确定删除该岗位吗?")){
+				id = $(this).attr('rel');
+				window.location="{:U('user/role_delete','id=')}"+id;
+			}
+		});
+	});
+	function changeContent(){
+		a = $("#select1  option:selected").val();
+		if(a=='1'){
+			window.location.href="{:U('user/index')}";
+		}else if(a=='2'){
+			window.location.href="{:U('user/index', 'status=0')}";
+		}else if(a=='3'){
+			window.location.href="{:U('user/index', 'status=-1')}";
+		}else if(a=='4'){
+			window.location.href="{:U('user/department')}";
+		}else if(a=='5'){
+			window.location.href="{:U('user/role')}";
+		}
+	} 
+
+	function deleteDepartment(id,name){
+		var v = confirm("确定删除部门-"+name+"吗?");
+		if(v == true){
+			window.location="{:U('User/department_delete','id=')}"+id;
+		}
+	}
+	$('#department_add').click(function () { 
+		$('#dialog-message').dialog('open');
+		$('#dialog-message').load('{:U('User/department_add')}');
+		return false;
+	});
+	<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=600;</if>
+	$('#dialog-message1').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight:400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#department_edit').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});
+	$('#dialog-message2').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#department_add').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});
+	$('#dialog-message3').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#role_add').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});
+	$('#dialog-message4').dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		position :["center",100],
+		buttons: {
+			"确认": function () {
+				$('#role_edit').submit();
+				$(this).dialog("close");
+			},
+			"取消": function () {
+				$(this).dialog("close");
+			}
+		}
+	});
+</script>
+<include file="Public:footer" />	

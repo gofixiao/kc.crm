@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="utf-8">
+    <title>微信绑定</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="悟空CRM">
+    <style type="text/css">
+		body {
+			background-color: #f5f5f5;
+		}
+		.form-signin {
+			max-width: 400px;
+			padding: 19px 29px 29px;
+			margin: 0 auto 20px;
+			background-color: #fff;
+			border: 1px solid #e5e5e5;
+			-webkit-border-radius: 5px;
+			   -moz-border-radius: 5px;
+					border-radius: 5px;
+			-webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+			   -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+					box-shadow: 0 1px 2px rgba(0,0,0,.05);
+		}
+		.form-signin .form-signin-heading,
+		.form-signin .checkbox {
+			margin-bottom: 10px;
+		}
+		.form-signin input[type="text"],
+		.form-signin input[type="password"] {
+			font-size: 16px;
+			height: auto;
+			margin-bottom: 15px;
+			padding: 7px 9px;
+		}
+		.wukong {
+			margin-top:30px;
+			padding-top:10px;
+			border-top:1px solid #e5e5e5;		
+		}
+    </style>
+  <body>
+    <div class="container">
+      <form action="" method="post" class="form-signin">
+		<fieldset>
+			<legend><h3>微信绑定</h3></legend>					
+			<include file="Public:alert" />
+			<input type="hidden" name="id" value="{$id}"/>
+			用户名：<input type="text" name="name" class="text-input" placeholder="用户名"/><br/>
+			密 &nbsp;&nbsp; 码：<input type="password" name="password" class="text-input" placeholder="密码"/>
+			<br/>
+			<input name="submit" class="btn btn-primary" type="submit" value="绑定"/>
+			</fieldset>
+			<div class="row-fluid wukong">
+				<div class="span9">
+					<p>悟空CRM &copy; 锐骑文化 2013</p>
+				</div>
+			</div>
+      </form>
+    </div>
+  </body>
+</html>

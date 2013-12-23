@@ -1,0 +1,209 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<h4>添加客户</h4>
+	</div>
+	<div class="row">
+		<div class="span12">
+			<include file="Public:alert" />
+			<form id="register" action="{:U(customer/add)}" method="post" onsubmit="editConfirm()">
+				<table class="table" width="95%" border="0" cellspacing="1" cellpadding="0">
+					<thead>
+						<tr>
+							<td>&nbsp;</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input class="btn btn-primary" name="submit" type="submit" value="保存"/>&nbsp; <input class="btn btn-primary" name="submit" type="submit" value="保存并新建"/> &nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td>&nbsp;</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input class="btn btn-primary" name="submit" type="submit" value="保存"/> &nbsp;<input class="btn btn-primary" name="submit" type="submit" value="保存并新建"/>&nbsp; <input class="btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<tr><th <if condition="C('ismobile') neq 1">colspan="4"<else/>colspan="2"</if>>基本信息</th></tr>
+						<tr>
+							<td class="tdleft" width="15%" >客户名</td>
+							<td width="35%"><input name="name" id="name" class="" type="text" />&nbsp;&nbsp;<input class="btn btn-mini" id="validate" name="validate" type="button" value="验重"></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" width="15%">类型</td>
+							<td width="35%">
+								<select name="account_type" id="account_type" title='' tabindex="108" >
+									<option value="客户">客户</option>
+									<option value="分析者">分析者</option>
+									<option value="竞争者">竞争者</option>
+									<option value="集成商">集成商</option>
+									<option value="投资商">投资商</option>
+									<option value="合作伙伴">合作伙伴</option>
+									<option value="出版商">出版商</option>
+									<option value="目标">目标</option>
+									<option value="供应商">供应商</option>
+									<option value="其它">其它</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft" >网站</td>
+							<td><input class="" id="address" name="website" type="text" value="http://"/></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >办公室电话</td>
+							<td><input class="" id="telephone" name="telephone" type="text" /></td>
+						</tr>
+						<tr>							
+							<td class="tdleft" >email</td>
+							<td><input class="" id="email" name="email" type="text" /></td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>							
+							<td class="tdleft" >行业</td>
+							<td>
+								<select name="industry_id" id="industry">
+									<option>--无--</option>
+									<volist name="industryList" id="vo">
+										<option value="{$vo.industry_id}">{$vo.name}</option>
+									</volist>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft" >公司性质</td>
+							<td>
+								<select name="ownership">
+									<option value="无">无</option>
+									<option value="国有企业">国有企业</option>
+									<option value="外资企业">外资企业</option>
+									<option value="民营企业">民营企业</option>
+									<option value="集体企业">集体企业</option>
+									<option value="股份制企业">股份制企业</option>
+									<option value="合资企业">合资企业</option>
+									<option value="独资企业">独资企业</option>
+									<option value="其他">其他</option>
+								</select>
+							</td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >年营业额</td>
+							<td>
+								<select name="annual_revenue" id="annual_revenue">
+									<option value=""> - 无 -</option>
+									<option value="1-10 万">1-50 万</option>
+									<option value="50-100 万">50-100 万</option>
+									<option value="100-200 万">100-200 万</option>
+									<option value="200-1000 万">200-1000 万</option>
+									<option value="1000万以上">1000万以上</option>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft">员工数:</td>
+							<td><select name="no_of_employees" id="no_of_employees">
+									<option value="">- 无 -</option>
+									<option value="5-10 人">5-10 人</option>
+									<option value="11-50 人">11-50 人</option>
+									<option value="51-100 人">51-100 人</option>
+									<option value="101-200 人">101-200 人</option>
+									<option value="201-300 人">201-300 人</option>
+									<option value="301-500 人">301-500 人</option>
+									<option value="501-1000 人">501-1000 人</option>
+									<option value="1000人以上">1000人以上</option>
+								</select></td>
+								<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft">邮编</td>
+							<td><input type="text" name="zip_code"></td>	
+						</tr>
+						<tr>
+							<td class="tdleft">联系地址</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input name="address" class="span6" type="text"/></td>
+						</tr>
+						<tr>
+							<th <if condition="C('ismobile') neq 1">colspan="4"<else/>colspan="2"</if>>其他信息</th>
+						</tr>
+						<tr>
+							<td class="tdleft" width="15%">负责人:</td>
+							<td <if condition="C('ismobile') neq 1">colspan="3"</if>><input type="hidden" name="owner_role_id" id="owner_id" value="{$Think.session.role_id}"/>
+							<input type="text" name="owner_name" id="owner_name" value="{$Think.session.name}"/></td>
+						</tr>
+						<tr>
+							
+							<td class="tdleft" >评分</td>
+							<td>
+								<select name="rating">
+									<option value="">-无-</option>
+									<option value="五星">五星</option>
+									<option value="四星">四星</option>
+									<option value="三星">三星</option>
+									<option value="二星">二星</option>
+									<option value="一星">一星</option>
+								</select>
+							</td>
+							<if condition="C('ismobile') eq 1"></tr><tr></if>
+							<td class="tdleft" >客户信息来源</td>
+							<td>
+								<select name="source_id" id="source">
+									<option>--无--</option>
+									<volist name="sourceList" id="vo">
+										<option value="{$vo.source_id}">{$vo.name}</option>
+									</volist>
+								</select>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft" >描述</td>
+							<td rows="6"  <if condition="C('ismobile') neq 1">colspan="3"</if>><textarea class="span8" rows="6" name="description"></textarea></td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</div>
+</div>
+<div id="dialog-role-list" title="选择客户所有人">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-role-list").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	buttons: { 
+		"Ok": function () {
+			var item = $('input:radio[name="owner"]:checked').val();
+			var name = $('input:radio[name="owner"]:checked').parent().next().html();
+			if(item){
+				$('#owner_name').val(name);
+				$('#owner_id').val(item);
+			}
+			$(this).dialog("close"); 
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	},
+	position: ["center", 100]
+});
+	
+$(function(){
+	$('#owner_name').click(
+		function(){
+			$('#dialog-role-list').dialog('open');
+			$('#dialog-role-list').load("{:U('user/listDialog')}");
+		}
+	);
+	$('#validate').click(
+		function(){
+			name = $('#name').val();
+			if(name!=''){
+				$.post('{:U("customer/validate")}',
+					{ 
+						name:name,
+					},
+					function(data){
+						alert(data.info);
+					},
+				'json');
+			} else {
+				alert('请填写客户名!');
+			}
+		}
+	);
+});
+</script>
+<include file="Public:footer" />

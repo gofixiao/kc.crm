@@ -1,0 +1,201 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>日志详情</h4>
+	</div>
+	<include file="Public:alert"/>
+	<div class="row">
+		<div class="tabbable span12">
+			<div class="tab-content">
+				<div class="tab-pane active" id="tab1">
+					<table class="table" border="0" cellspacing="1" cellpadding="0">
+						<thead>
+							<tr>
+								<td colspan="2">
+									<span style="font-size: 14px;">
+										<if condition="$comment_role_id">
+										<a id="comment_btn" href="javascript:void(0);">评论</a> &nbsp; | &nbsp; 
+										</if>
+										<a href="{:U('log/mylog_edit','id='.$log['log_id'].'&type='.$_GET['type'])}">编辑</a> &nbsp; | &nbsp; 
+										<a href="{:U('log/log_delete','redirect=index&id='.$log['log_id'])}">删除</a> &nbsp; | &nbsp; 
+										<a href="{:U('log/index')}">返回列表页</a>
+									</span>
+								</td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td colspan="2"><span style="font-size: 18px;color: #000;font-weight: 600;">{$log.subject} &nbsp; <span style="font-size:14px;"><span style="font-weight:500;color: #000;">(<notempty name="log['creator']['user_name']"><a class="role_info" rel="{$log.creator.role_id}" href="javascript:void(0)"><span style="font-size:14px;">{$log.creator.user_name}</span></a></notempty>:{$log.create_date|date="Y-m-d H:i",###})</span></span>&nbsp;  &nbsp;  &nbsp; </span> <if condition="$pre_href"><a href="{$pre_href}">上一篇</a></if> &nbsp;  &nbsp;  &nbsp;<if condition="$next_href"><a href="{$next_href}">下一篇</a></if></td>
+								
+							</tr>
+							<tr>
+								<th colspan="2">基本信息</th>
+							</tr>
+							<if condition="$_GET['type'] eq 1">
+								<tr>
+									<if condition="!empty($log['customer_id'])">
+										<td class="tdleft" width="17%">所属客户:</td>
+										<td><div><a href="{:U('customer/view','id='.$log['customer_id'])}" target="blank">{$log.customer_name}</a></div></td>
+									<elseif condition="!empty($log['contacts_id'])"/>
+										<td class="tdleft" width="17%">所属联系人:</td>
+										<td><div><a href="{:U('contacts/view','id='.$log['contacts_id'])}" target="blank">{$log.contacts_name}</a></div></td>
+									<elseif condition="!empty($log['business_id'])"/>
+										<td class="tdleft" width="17%">所属商机:</td>
+										<td><div><a href="{:U('business/view','id='.$log['business_id'])}" target="blank">{$log.business_name}</a></div></td>
+									<elseif condition="!empty($log['task_id'])"/>
+										<td class="tdleft" width="17%">所属任务:</td>
+										<td><div><a href="{:U('task/view','id='.$log['task_id'])}" target="blank">{$log.task_name}</a></div></td>
+									<elseif condition="!empty($log['event_id'])"/>
+										<td class="tdleft" width="17%">所属日程:</td>
+										<td><div><a href="{:U('event/view','id='.$log['event_id'])}" target="blank">{$log.event_name}</a></div></td>
+									</if>
+								</tr>
+							</if>
+							<tr>
+								<td class="tdleft" width="17%">内容:</td>
+								<td><div style="min-height:200px"><if condition="$log.content neq null">{$log.content}</if></div></td>
+							</tr>
+							<tr>
+								<td class="tdleft">评论:</td>
+								<td>
+									<table width="100%">
+										<empty name="comment_list">
+											<tr>
+												<td colspan="2">--暂无上级评论!--</td>
+											</tr>
+										<else />
+											<volist name="comment_list" id="vo">
+												<tr>
+													<td colspan="2">评论人:<a class="role_info" rel="{$vo.role_id}" href="javascript:void(0)">{$vo.user_name}</a>（{$vo.create_time|date="Y-m-d H:i",###}）<if condition="$vo['role_id'] == session('role_id')">
+															<a rel="{$vo['comment_id']}" class="edit_comment_btn" href="javascript:void(0);">编辑</a>
+														</if></td>
+												</tr>
+												<tr>
+													<td colspan="2"><if condition="$vo.content neq null"><pre>{$vo.content}</pre></if></td>
+												</tr>
+											</volist>
+										</empty>
+									</table>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div class="tab-pane" id="tab2">
+					<table class="table table-hover">
+						<if condition="$log.file eq null">
+							<tr>
+								<td>没有数据 </td>
+							</tr>
+						<else /> 
+							<tr>
+								<th>&nbsp;</th>
+								<th>文件名</th>
+								<th>大小</th>
+								<th>添加者</th>
+								<th>添加时间</th>
+							</tr>
+							<volist name="log.file" id="vo">
+								<tr>
+									<td class="tdleft"><a href="{:U('file/delete','r=RFileLeads&id='.$vo['file_id'])}">删除</a></td>
+									<td>
+										<a target="_blank" href="{$vo.file_path}">{$vo.name}</a>
+									</td>
+									<td>
+										{$vo.size}字节
+									</td>
+									<td>
+										<notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty>
+									</td>
+									<td>
+										<notempty name="vo.create_date">{$vo.create_date|date="Y-m-d g:i:s a",###}</notempty>
+									</td>
+								</tr>
+							</volist>
+						</if>
+						<tr>
+							<td colspan="5">
+								<a href="javascript:void(0);" class="add_file">添加</a>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="hide" id="dialog-file" title="添加附件">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<if condition="$comment_role_id">
+<div class="hide" id="dialog-comment" title="评论">loading...</div>
+<div class="hide" id="dialog-editcomment" title="修改评论">loading...</div>
+</if>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=600;</if>
+$("#dialog-file").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeigth: 400,
+	position: ["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-comment").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100],
+	buttons: { 
+		"确认": function () {
+			$('#comment').submit();
+			$(this).dialog("close"); 
+		},
+		"取消": function () {
+			$(this).dialog("close");
+		}
+	}
+});
+$("#dialog-editcomment").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100],
+	buttons: { 
+		"确认": function () {
+			$('#editcomment').submit();
+			$(this).dialog("close"); 
+		},
+		"取消": function () {
+			$(this).dialog("close");
+		}
+	}
+});
+$(function(){
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	<if condition="$comment_role_id">
+	$("#comment_btn").click(function(){
+		$('#dialog-comment').dialog('open');
+		$('#dialog-comment').load('{:U("comment/add","to_role_id=".$log["role_id"]."&module=log&module_id=".$log["log_id"])}');
+	});
+	$(".edit_comment_btn").click(function(){
+		comment_id = $(this).attr('rel');
+		$('#dialog-comment').dialog('open');
+		$('#dialog-comment').load('{:U("comment/edit","to_role_id=".$log["role_id"]."&id=")}'+comment_id);
+	});
+	</if>
+});
+</script>
+<include file="Public:footer" />

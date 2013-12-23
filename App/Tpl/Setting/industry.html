@@ -1,0 +1,143 @@
+<include file="Public:header" />
+<style>
+table tbody tr{cursor:move;}
+</style>
+<div class="container">
+	<div class="page-header">
+		<h4>系统设置</h4>
+	</div>
+	<include file="Public:alert" />
+	<div class="tabbable">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('setting/defaultInfo')}">系统基本设置</a></li>
+			<li><a href="{:U('setting/smtp')}">SMTP设置</a></li>
+			<li class="active"><a href="{:U('setting/leadsstatus')}">自定义字段设置</a></li>		
+			<li><a href="{:U('product/category')}">产品分类设置</a></li>
+			<li><a href="{:U('knowledge/category')}">知识分类设置</a></li>
+			<li><a href="{:U('navigation/setting')}">系统菜单设置</a></li>
+			<li><a href="{:U('setting/weixin')}">微信公共账号设置</a></li>
+		</ul>
+	</div>
+	<div class="row">
+		<div class="span2 knowledgecate">
+			<ul class="nav nav-list">
+				<li class="active">
+					<a href="javascript:void(0);">自定义字段设置</a>
+				</li>
+				<li><a href="{:U('setting/leadsstatus')}"><i class="icon-chevron-right"></i>线索状态设置</a></li>
+				<li><a href="{:U('setting/businessstatus')}"><i class="icon-chevron-right"></i>商机状态设置</a></li>
+				<li><a class="active" href="{:U('setting/industry')}"><i class="icon-chevron-right"></i>行业设置</a></li>
+				<li><a href="{:U('setting/source')}"><i class="icon-chevron-right"></i>信息来源设置</a></li>
+                <li><a href="{:U('setting/fields')}"><i class="icon-chevron-right"></i>自定义字段设置</a></li>
+			</ul>
+		</div>
+		<form action="{:U('setting/industrydelete')}" method="post">
+			<div class="span10">
+				<p><div class="bulk-actions align-left">
+					<input type="submit" class="btn" value="删除"/> &nbsp; <a class="btn" id="sort_btn">保存顺序</a>
+					<div class="pull-right">
+						<a class="btn btn-primary" id="add">添加行业</a>
+					</div>
+				</div></p>
+			</div>
+			<div class="span10">
+				<table class="table table-hover" width="95%" border="0" cellspacing="1" cellpadding="0">
+					<notempty name="industryList">
+					<thead>
+						<tr>
+							<th width="10%"><input type="checkbox" name="check_all" id="check_all" class="check_all"/> &nbsp;</th>
+							<th width="20%">行业名</th>
+							<th width="50%">行业描述</th>
+							<th width="20%">操作</th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td colspan="4">
+								<div class="span8"><span style="color: rgb(243, 40, 12);">*提示：拖动可改变状态顺序</span></div>
+							</td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<volist name="industryList" id="vo">
+							<tr>
+								<td><input type="checkbox" class="list" name="industry_id[]" value="{$vo.industry_id}"/>
+								</td>
+								<td>{$vo.name}</td>
+								<td>{$vo.description}</td>
+								<td><a class="edit" href="javascript:void(0)" rel="{$vo.industry_id}">编辑</a> &nbsp; &nbsp;<a class="delete" href="javascript:void(0)" rel="{$vo.industry_id}">删除</a></td>
+							</tr>
+						</volist>
+					</tbody>
+					<else />
+						<tr>
+							<td>----暂无数据！----</td>
+						</tr>
+					</notempty>
+				</table>
+			</div> 
+		</form>
+	</div>
+<div class="hide" id="dialog-add" title="添加状态">loading...</div>
+<div class="hide" id="dialog-edit" title="修改状态">loading...</div>
+<div class="hide" id="dialog-delete" title="删除状态">loading...</div>
+</div>
+<script type="text/javascript">	
+$("#dialog-add").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-edit").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-delete").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+
+$("table tbody").sortable({connectWith: "table tbody"});
+
+$(function(){
+	$("#check_all").click(function(){
+		$("input[class='list']").prop('checked', $(this).prop("checked"));
+	});
+	$("#add").click(function(){
+		$('#dialog-add').dialog('open');
+		$('#dialog-add').load('{:U("setting/industryadd")}');
+	});
+	$(".edit").click(function(){
+		var id = $(this).attr('rel');
+		$('#dialog-edit').dialog('open');
+		$('#dialog-edit').load('{:U("setting/industryedit","id")}'+id);
+	});
+	$(".delete").click(function(){
+		var id = $(this).attr('rel');
+		$('#dialog-delete').dialog('open');
+		$('#dialog-delete').load('{:U("setting/industrydelete","id")}'+id);
+	});
+	$("#sort_btn").click(
+		function() {
+			position = [];
+			$.each($(".list"), function(i, item){position.push(item.value)});
+			$.get('{:U("setting/industrysort")}',{postion:position.join(',')}, function(data){
+				if (data.status == 1) {
+					$(".page-header").after('<div class="alert alert-success"><button type="button" class="close" data-dismiss="alert">×</button>' + data.info + '</div>');
+				} else {
+					$(".page-header").after('<div class="alert alert-error"><button type="button" class="close" data-dismiss="alert">×</button>' + data.info + '</div>');
+				}
+			}, 'json');
+		}	
+	);
+})
+</script>
+<include file="Public:footer" />

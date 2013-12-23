@@ -1,0 +1,205 @@
+<include file="Public:header" />
+<script src="__PUBLIC__/js/chart/highcharts.js"></script>
+<script src="__PUBLIC__/js/chart/modules/exporting.js"></script>
+
+<div class="container">
+	<div style="margin-top:10px; font-size:14px;">
+		<ul class="nav nav-tabs">
+		  <li>
+			<a href="{:U('task/index')}"><img src="__PUBLIC__/img/task_checked2.png"/>&nbsp; 任务</a>
+		  </li>
+		  <li class="active"><a href="{:U('task/analytics')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp;统计</a></li>
+		</ul>
+	</div>
+	<include file="Public:alert" />
+	<div class="row">
+		<div class="span12">
+			<ul class="nav pull-left">
+				<li class="pull-left">
+					<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="" method="get">
+						<ul class="nav pull-left">
+							<li class="pull-left">
+								选择部门：&nbsp; <select style="width:auto" name="department" id="department" onchange="changeRole()">
+									<option class="all" value="all">全部</option>
+									<volist name="departmentList" id="vo">
+										<option value="{$vo.department_id}">{$vo.name}</option>
+									</volist>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li class="pull-left">
+								选择员工：&nbsp; <select style="width:auto" name="role" id="role" onchange="changeCondition()">
+									<option class="all" value="all">全部</option>
+									<volist name="roleList" id="vo">
+										<option value="{$vo.role_id}">{$vo.role_name}-{$vo.user_name}</option>
+									</volist>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li class="pull-left">
+								选择日期：&nbsp; 从<input type="text" id="start_time" name="start_time" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" class="Wdate" value="{$Think.get.start_time}"/>至<input type="text" id="end_time" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd'})" name="end_time" class="Wdate" value="{$Think.get.end_time}" />&nbsp;&nbsp;
+							</li>
+							<li class="pull-left"><input type="hidden" name="m" value="task"/><input type="hidden" name="a" value="analytics"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<button type="submit" class="btn">搜索</button></li>
+						</ul>
+					</form>
+				</li>				
+			</ul>
+		</div>
+		<div class="span2 knowledgecate">
+			<ul class="nav nav-list">
+				<li class="active">
+					<a href="javascript:void(0);">选择统计内容</a>
+				</li>
+				<li id="report"><a id="show_report" class="active" href="javascript:void(0)"><i class="icon-white icon-chevron-right"></i>任务统计报表</a></li>
+				<li id="scale"><a id="show_completion" href="javascript:void(0)"><i class="icon-white icon-chevron-right"></i>任务完成情况统计</a></li>
+			</ul>
+		</div>
+		<div class="span10">
+			<div class="span10" id="report_content">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>员工</th>
+							<th>任务总数</th>
+							<th>未启动任务数</th>
+							<th>推迟中任务</th>
+							<th>进行中任务</th>
+							<th>完成任务</th>
+						</tr>
+					</thead>
+
+					<tfoot>
+						<tr>
+							<td>共计:</td>
+							<td colspan="5"><span style="color:red;">有效任务：{$total_report.own_count} 条 &nbsp; 未启动：{$total_report.new_count} 条 &nbsp;推迟中：{$total_report.late_count} 条 &nbsp;
+							进行中：{$total_report.deal_count} 条 &nbsp;
+							完成任务： {$total_report.success_count} </span></td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<volist name="reportList" id="vo">
+						<tr>
+							<td><a class="role_info" rel="{$vo.user.role_id}" href="javascript:void(0)">{$vo.user.user_name}</a></td>
+							<td>{$vo.own_count}</td>
+							<td><a href="{:U('task/index')}&field=owner_role_id&search={$vo.user.role_id}&by=s1">{$vo.new_count}</a></td>
+							<td><a href="{:U('task/index')}&field=owner_role_id&search={$vo.user.role_id}&by=s2">{$vo.late_count}</a></td>
+							<td><a href="{:U('task/index')}&field=owner_role_id&search={$vo.user.role_id}&by=s3">{$vo.deal_count}</a></td>
+							<td><a href="{:U('task/index')}&field=owner_role_id&search={$vo.user.role_id}&by=s4">{$vo.success_count}</a></td>
+						</tr>
+						</volist>
+					</tbody>
+				</table>
+			</div>
+			
+			<div id="completion_content" class="hidden span10">
+				<div id="an_chart" class="span6">
+					<div id="canvas_completion" style="min-width: 500px; height: 500px; margin: 0 auto">暂无数据!</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+	<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+	$("#dialog-role-info").dialog({
+		autoOpen: false,
+		modal: true,
+		width: width,
+		maxHeight: 400,
+		position: ["center",100]
+	});
+	
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	
+	$(function () {
+		$(document).ready(function () {
+			var chart1;
+			// Build the chart1
+			<if condition="$total_report.own_count gt 0">
+			$('#canvas_completion').highcharts({
+				chart1: {
+					plotBackgroundColor: null,
+					plotBorderWidth: null,
+					plotShadow: false
+				},
+				title: {
+					text: '任务完成情况统计 (共计{$total_report.own_count}条)'
+				},
+				tooltip: {
+					pointFormat: '{series.name}: <b>{point.percentage}%</b>',
+					percentageDecimals: 1
+				},
+				plotOptions: {
+					pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						dataLabels: {
+							enabled: false
+						},
+						showInLegend: true
+					}
+				},
+				series: [{
+					type: 'pie',
+					name: '阶段占比',
+					data: [
+						{$completion_count}
+					]
+				}]
+			});
+			</if>
+		});
+		
+	});
+	
+	function changeRole(){
+		department_id = $("#department option:selected").val();
+		$.ajax({
+			type:'get',
+			url:'index.php?m=user&a=getrolebydepartment&department_id='+department_id,
+			async:true,
+			success:function(data){
+				options = '<option value="all">全部</option>';
+				if(data.data != null){
+					$.each(data.data, function(k, v){
+						options += '<option value="'+v.role_id+'">'+v.role_name+"-"+v.user_name+'</option>';
+					});
+				}
+				$("#role").html(options);
+				<if condition="$_GET['role']">
+				$("#role option[value='{$Think.get.role}']").prop("selected", true);
+				</if>
+			},
+			dataType:'json'});
+	}
+	
+	<if condition="$_GET['department'] and $_GET['department'] neq 'all'">
+	$("#department option[value='{$Think.get.department}']").prop("selected", true); 
+	changeRole();
+	</if>
+	<if condition="$_GET['department'] eq 'all'">
+	$("#role option[value='{$Think.get.role}']").prop("selected", true);
+	</if>
+	
+	$(function(){
+		$("#show_report").click(function(){
+			$(this).addClass('active');
+			$("#show_completion").removeClass('active');
+			$("#report_content").removeClass('hidden');
+			$("#completion_content").addClass('hidden');
+		});
+		$("#show_completion").click(function(){
+			$(this).addClass('active');
+			$("#show_report").removeClass('active');
+			$("#completion_content").removeClass('hidden');
+			$("#report_content").addClass('hidden');
+		});
+	});
+</script>
+<include file="Public:footer" />

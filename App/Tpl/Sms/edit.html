@@ -1,0 +1,25 @@
+
+<form action="{:U('sms/edit')}" method="post">
+	<input type="hidden" name="template_id" value="{$template['template_id']}">
+	<table class="table" border="0" cellspacing="1" cellpadding="0">
+		<tfoot>
+			<tr>
+				<td colspan="2"><input class="btn btn-primary" name="submit" type="submit" value="保存"/> &nbsp; <input class="btn btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<th colspan="2">基本信息</th>
+			<tr>
+				<td class="tdleft">标题：</td>
+				<td><input type="text" name="subject" class="span4" value="{$template['subject']}"/></td>
+			</tr>
+			<tr>
+				<td class="tdleft">内容：</td>
+				<td>
+					如需客户姓名请在内容中加入"<font color="red">{</font><font color="red">$name}</font>"(红色字体),单条短信内容最多55个字<br/>
+					<textarea name="content" id="content" style="width: 400px; height: 100px;">{$template['content']}</textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</form>

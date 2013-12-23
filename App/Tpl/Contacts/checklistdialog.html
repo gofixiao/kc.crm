@@ -1,0 +1,158 @@
+<div>
+	<ul class="nav pull-left">
+		<li class="pull-left">
+			<select style="width:auto" id="field" name="field" onchange="changeCondition()">
+				<option class="word" value="name">联系人姓名</option>
+				<option class="role" value="owner_role_id">负责人</option>
+				<option class="word" value="telephone">电话</option>
+				<option class="word" value="qq">QQ</option>
+				<option class="word" value="saltname">尊称</option>
+				<option class="word" value="email">邮箱</option>
+				<option class="word" value="address">地址</option>
+				<option class="word" value="post">职位</option>
+				<option class="word" value="description">备注</option>
+				<option class="date" value="create_time">创建时间</option>
+				<option class="date" value="update_time">修改时间</option>
+			</select>&nbsp;&nbsp;
+		</li>
+		<li id="conditionContent" class="pull-left">
+			<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+				<option value="contains">包含</option>
+				<option value="not_contain">不包含</option>
+				<option value="is">是</option>
+				<option value="isnot">不是</option>						
+				<option value="start_with">开始字符</option>
+				<option value="end_with">结束字符</option>
+				<option value="is_empty">为空</option>
+				<option value="is_not_empty">不为空</option>
+			</select>&nbsp;&nbsp;
+		</li>
+		<li id="searchContent" class="pull-left">
+			<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+		</li>
+		<li class="pull-left">
+			<input type="button" onclick="d_changeContent(0)" class="btn" value="搜索"/>
+		</li>
+		&nbsp;<a target="_blank" href="{:U('contacts/add','redirect=customer&redirect_id='.$model_id)}">新建联系人</a>
+	</ul>
+</div>
+
+<p>&nbsp;</p>
+<empty name="contactsList">
+	<div class="alert">没有数据</div>
+<else/>
+<form id="select_contacts" action="{:U('contacts/checklistdialog')}" method="post">
+	<input type="hidden" name="r" <present name="r">value="{$r}"</present>/>
+	<input type="hidden" name="module" <present name="module">value="{$module}"</present>/> 
+	<input type="hidden" name="id" <present name="model_id">value="{$model_id}"</present>/> 
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>&nbsp;</th>
+				<th width="20%">姓名</th>
+				<th width="25%">电 话</th>
+				<if condition="C('ismobile') neq 1"><th width="25%">邮 箱</th></if>	
+				<th width="25%">职 位</th>
+			</tr>
+		</thead>
+		<tfoot id="footer">
+			<tr>
+				<td colspan="6">
+					<div class="row pagination">
+						<div class="span2"><span id="count">{$count_num}</span> 条记录 <span id="p">1</span>/<span id="total_page">{$total}</span> 页</div>
+						<div class="span4">
+							<div><ul id="changepage">
+								<li><span class='current'>首页</span></li><li><span>« 上一页</span></li>
+								<if condition="$total gt 1">
+									<li><a class="page" href="javascript:void(0)" rel="2">下一页 »</a></li>
+								<else />
+									<li><span>下一页 »</span></li>
+								</if>
+							</ul></div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</tfoot>
+		<tbody id="load" class="hide">
+			<tr><td class="tdleft" <if condition="C('ismobile') neq 1">colspan="6"<else />colspan="4"</if> style=" height:300px;text-align:center"><img src="./Public/img/load.gif"></td></tr>
+		</tbody>
+		<tbody id="data">
+			<volist name="contactsList" id="vo">
+				<tr> 
+					<td><input type="checkbox" name="contacts_id[]" value="{$vo.contacts_id}"/></td>
+					<td><a target="_blank" href="{:U('contacts/view','id='.$vo['contacts_id'])}">{$vo.name}</a></td>
+					<td>{$vo.telephone}</td>
+					<if condition="C('ismobile') neq 1"><td>{$vo.email}</td></if>			
+					<td>{$vo.post}</td>
+				</tr>
+			</volist>
+		</tbody>
+	</table>
+</form>
+</empty>
+<script type="text/javascript">
+	function sub(){
+		$('#select_contacts').submit();
+		alert(1);
+	}
+	$('.page').click(function(){
+		var a = $(this).attr('rel');
+		d_changeContent(a);
+	});
+	function d_changeContent(p){
+		$('#data').addClass('hide');
+		$('#load').removeClass('hide');
+		
+		var field = $('#field').val();
+		var condition = $('#condition').val();
+		var asearch = encodeURI($("#search").val());
+		var link = "{:U('contacts/view','id=')}";
+		$.ajax({
+			type:'get',
+			url:'index.php?m=contacts&a=changedialog&r=RContactsCustomer&is_check=1&field='+field+'&search='+asearch+'&condition='+condition+'&p='+p,
+			async:false,
+			success:function(data){
+				var temp = '';
+				if(data.data.list != null){
+					$.each(data.data.list, function(k, v){
+						temp += "<tr><td><input type='checkbox' name='contacts_id[]' value='"+v.contacts_id+"'/></td><td><a target='_blank' href="+link+v.contacts_id+">" + v.name + "</a></td><td>" + v.telephone + "</td>";
+						<if condition="C('ismobile') neq 1">
+							temp += "<td>"+v.email+"</td><td>"+v.post+"</td></tr>";
+						<else />
+							temp += "<td>"+v.post+"</td></tr>";
+						</if>
+					});
+					var changepage = "";
+					if(data.data.p == 1){
+						changepage = "<li><span class='current'>首页</span></li><li><span>« 上一页 </span></li>"
+						if(data.data.p < data.data.total){
+							changepage += "<li><a class='page' href='javascript:void(0)' rel='"+(data.data.p+1)+"'>下一页 »</a></li>";
+						}else{
+							changepage += "<li><span>下一页 »</span></li>";
+						}
+					}else if(data.data.p == data.data.total){
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><span>下一页 »</span></li>"
+					}else{
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p+1)+"'>下一页 »</a></li>"
+					}
+					$('#p').html(data.data.p);
+					$('#changepage').html(changepage);
+					$('#count').html(data.data.count);
+					$('#total_page').html(data.data.total);
+					$('#data').html(temp);
+					$('.page').click(function(){
+						var a = $(this).attr('rel');
+						d_changeContent(a);
+					});
+				}else{
+					$('#data').html('<tr><td colspan="4">没有找到您要的结果！</tr>');
+					$('#footer').addClass('hide');
+				}
+				$('#load').addClass('hide');
+				$('#data').removeClass('hide');
+			},
+			dataType:'json'
+		});		
+	}
+</script>

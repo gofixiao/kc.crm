@@ -1,0 +1,212 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header"><h4>日志</h4></div>
+	<include file="Public:alert" />
+	<p class="view"><b>视图：</b>
+	<img src=" __PUBLIC__/img/by_owner.png"/> <a href="{:U('log/index')}" <if condition="$Think.get.by eq null">class="active"</if>>全部</a> |
+	<a href="{:U('log/index','by=me')}" <if condition="$Think.get.by eq 'me'">class="active"</if>>我的日志</a> |
+	<a href="{:U('log/index','by=sub')}" <if condition="$Think.get.by eq 'sub'">class="active"</if>>下属日志</a> &nbsp; &nbsp; &nbsp; &nbsp;
+	<img src="__PUBLIC__/img/by_time.png"/> <a href="{:U('log/index','by=today')}" <if condition="$Think.get.by eq 'today'">class="active"</if>>今天的</a> | 
+	<a href="{:U('log/index','by=week')}" <if condition="$Think.get.by eq 'week'">class="active"</if>>本周的</a> | 
+	<a href="{:U('log/index','by=month')}" <if condition="$Think.get.by eq 'month'">class="active"</if>>本月的</a>  &nbsp; 
+	<a href="{:U('log/index','by=add')}" <if condition="$Think.get.by eq 'add'">class="active"</if>>最近创建</a> | 
+	<a href="{:U('log/index','by=update')}" <if condition="$Think.get.by eq 'update'">class="active"</if>>最近修改</a>
+	</p>
+	<div class="row">
+		<div class="span2 knowledgecate">
+			<ul class="nav nav-list">
+				<li class="active">
+					<a href="javascript:void(0);">按日志类型查看</a>
+				</li>
+				<li><a href="{:U('log/index','by='.$_GET['by'])}" <if condition="$_GET['type'] eq null">class="active"</if>><i class="icon-white icon-chevron-right"></i>全部</a></li>
+				<volist name="category_list" id="vo">
+					<li><a href="{:U('log/index','type='.$vo['category_id'].'&by='.$_GET['by'])}" <if condition="$_GET['type'] eq $vo['category_id']">class="active"</if>><i class="icon-chevron-right"></i>{$vo['name']}</a></li>
+				</volist>
+			</ul>
+		</div>
+		<div class="span10">
+			<php>if($_GET['type'] == 1 ){</php><p style="font-size:14px;"><if condition="$_GET['type'] == 1">
+					<b>选择模块：</b><a <if condition="$_GET['module'] == null">class="active"</if> href="{:U('Log/index','by='.$_GET['by'].'&type=1')}">全部模块</a> &nbsp; | &nbsp; 
+					<a <if condition="$_GET['module'] == 'customer'">class="active"</if> href="{:U('Log/index','r=rCustomerLog&module=customer&by='.$_GET['by'].'&type=1')}">客户</a> &nbsp; | &nbsp; 
+					<a <if condition="$_GET['module'] == 'contacts'">class="active"</if> href="{:U('Log/index','r=rContactsLog&module=contacts&by='.$_GET['by'].'&type=1')}">联系人</a> &nbsp; | &nbsp; 
+					<a <if condition="$_GET['module'] == 'business'">class="active"</if> href="{:U('Log/index','r=rBusinessLog&module=business&by='.$_GET['by'].'&type=1')}">商机</a> &nbsp; | &nbsp; 
+					<a <if condition="$_GET['module'] == 'task'">class="active"</if> href="{:U('Log/index','r=rLogTask&module=task&by='.$_GET['by'].'&type=1')}">任务</a> &nbsp; | &nbsp; 
+					<a <if condition="$_GET['module'] == 'event'">class="active"</if> href="{:U('Log/index','r=rEventLog&module=event&by='.$_GET['by'].'&type=1')}">日程</a>
+			</if></p><php>}</php>
+			<ul class="nav pull-left">		
+				<li class="pull-left"><a id="delete" class="btn" style="margin-right: 5px;"><i class="icon-remove"></i>&nbsp;删除</a> </li>
+				<!-- <if condition="$_GET['type'] == 1">
+					<select style="width:auto;"  class="nav pull-left" id="module" onchange="changeContent()">
+						<option <if condition="$_GET['module'] == null">selected</if> value="6">全部模块</option>
+						<option <if condition="$_GET['module'] == 'customer'">selected</if> value="1">客户</option>
+						<option <if condition="$_GET['module'] == 'contacts'">selected</if> value="2">联系人</option>
+						<option <if condition="$_GET['module'] == 'business'">selected</if> value="3">商机</option>
+						<option <if condition="$_GET['module'] == 'task'">selected</if> value="4">任务</option>
+						<option <if condition="$_GET['module'] == 'event'">selected</if> value="5">日程</option>
+					</select>
+				</if> -->
+				<li class="pull-left">
+					<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="index.php" method="get">
+						<ul class="nav pull-left">
+							<li class="pull-left">
+								&nbsp;
+								<select id="field" style="width:auto" onchange="changeCondition()" name="field">
+									<option class="all" value="all">任意字段</option>
+									<option class="role" value="role_id">作者</option>
+									<option class="word" value="subject">标题</option>
+									<option class="word" value="content">内容</option>
+									<option class="date" value="create_date">创建时间</option>
+									<option class="date" value="update_date">修改时间</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="conditionContent" class="pull-left">
+							<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+								<option value="contains">包含</option>
+								<option value="not_contain">不包含</option>
+								<option value="is">是</option>
+								<option value="isnot">不是</option>						
+								<option value="start_with">开始字符</option>
+								<option value="end_with">结束字符</option>
+								<option value="is_empty">为空</option>
+								<option value="is_not_empty">不为空</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="searchContent" class="pull-left"><input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;</li>
+							<li class="pull-left"><input type="hidden" name="m" value="log"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<if condition="$Think.get.type neq null"><input type="hidden" name="type" value="{$Think.get.type}"/></if>
+							<if condition="$Think.get.module neq null"><input type="hidden" name="module" value="{$Think.get.module}"/></if>
+							<if condition="$Think.get.r neq null"><input type="hidden" name="r" value="{$Think.get.r}"/></if>
+							<button type="submit" class="btn"> <img src="__PUBLIC__/img/search.png"/>  搜索</button></li>
+						</ul>
+					</form>
+				</li>
+			</ul>
+			<div class="pull-right">
+				<a href="{:U('log/mylog_add')}" class="btn btn-primary"><i class="icon-plus"></i>&nbsp; 新建日志</a>
+			</div>
+		</div>
+		<div class="span10">
+			<form id="form1" method="post">
+			<table class="table table-hover">
+				<if condition="$list eq null">
+					<tr><td>----暂无数据！----</td></tr>
+				<else/>
+					<thead>
+						<tr>
+							<th><input id="check_all" class="control_all" type="checkbox" /></th>
+							<th width="10px"></th>
+							<th>标题</th>
+							<th>作者</th>
+							<if condition = "($_GET['type'] eq 1) and ($_GET['module'] eq '')">
+								<th>所属</th>
+							<elseif condition = "($_GET['type'] eq 1) and ($_GET['module'] eq 'customer')" />
+								<th>所属客户</th>
+							<elseif condition = "($_GET['type'] eq 1) and ($_GET['module'] eq 'contacts')" />
+								<th>所属联系人</th>
+							<elseif condition = "($_GET['type'] eq 1) and ($_GET['module'] eq 'business')" />
+								<th>所属商机</th>
+							<elseif condition = "($_GET['type'] eq 1) and ($_GET['module'] eq 'task')" />
+								<th>所属任务</th>
+							<elseif condition = "($_GET['type'] eq 1) and ($_GET['module'] eq 'event')" />
+								<th>所属日程</th>
+							</if>
+							<th>创建时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<td colspan="7">
+								<p>注: <span style="color:green"><i class="icon-check"></i></span>已有上级审核 &nbsp; &nbsp;  <span style="color:red"><i class="icon-edit"></i></span>待审核</p>
+								{$page}
+							</td>
+						</tr>
+					</tfoot>
+					<tbody>
+						<volist name="list" id="vo">
+						<tr>
+							<td><input class="check_list" type="checkbox" name="log_id[]" value="{$vo.log_id}"/></td>
+							<td><if condition="$vo['is_comment']"><span style="color:green"><i class="icon-check"></i></span><else /><span style="color:red"><i class="icon-edit"></i></span></if></td>
+							<td><a href="{:U('log/mylog_view','id='.$vo['log_id'].'&type='.$_GET['type'])}">{$vo.subject}</a></td>
+							<td><notempty name="vo.creator.user_name"><a class="role_info" rel="{$vo.creator.role_id}" href="javascript:void(0)">{$vo.creator.user_name}</a></notempty></td>
+							<if condition="$_GET['type'] == 1">
+							<td>
+								<if condition="$vo['customer_name'] neq null">
+									<a href="{:U('customer/view','id='.$vo['customer_id'])}" target="blank">{$vo.customer_name}</a>
+								<elseif condition="$vo['contacts_name'] neq null" />
+									<a href="{:U('contacts/view','id='.$vo['contacts_id'])}" target="blank">{$vo.contacts_name}</a>
+								<elseif condition="$vo['business_name'] neq null" />
+									<a href="{:U('business/view','id='.$vo['business_id'])}" target="blank">{$vo.business_name}</a>
+								<elseif condition="$vo['task_name'] neq null" />
+									<a href="{:U('task/view','id='.$vo['task_id'])}" target="blank">{$vo.task_name}</a>
+								<elseif condition="$vo['event_name'] neq null" />
+									<a href="{:U('event/view','id='.$vo['event_id'])}" target="blank">{$vo.event_name}</a>
+								<else />
+									无
+								</if>
+							</td>
+							</if>
+							<td>{$vo.create_date|date="Y-m-d H:i:s",###}</td>
+							<td>
+								<a href="{:U('log/mylog_view','id='.$vo['log_id'].'&type='.$_GET['type'])}">查看</a>
+								<a href="{:U('log/mylog_edit','id='.$vo['log_id'].'&type='.$_GET['type'])}">修改</a>
+							</td>
+						</tr>
+						</volist>
+					</tbody>
+				</if>
+			</table>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(function(){
+	<if condition="$Think.get.field neq null">
+		$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+		$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+		$("#search").prop('value', '{$Think.get.search}');
+	</if>
+	$('#delete').click(function(){
+		if(confirm('你确定要删除?')){
+			$("#form1").attr('action', '{:U("log/log_delete")}');
+			$("#form1").submit();
+		}
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	$("#check_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+})
+function changeContent(){
+	$module = $('#module').val();
+	if($module == 6){
+		window.location='{:U('Log/index','by='.$_GET['by'].'&type=4')}';
+	}else if($module == 1){
+		window.location='{:U('Log/index','r=rCustomerLog&module=customer&by='.$_GET['by'].'&type=1')}';
+	}else if($module == 2){
+		window.location = '{:U('Log/index','r=rContactsLog&module=contacts&by='.$_GET['by'].'&type=1')}';
+	}else if($module == 3){
+		window.location='{:U('Log/index','r=rBusinessLog&module=business&by='.$_GET['by'].'&type=1')}';
+	}else if($module == 4){
+		window.location='{:U('Log/index','r=rLogTask&module=task&by='.$_GET['by'].'&type=1')}';
+	}else if($module == 5){
+		window.location='{:U('Log/index','r=rEventLog&module=event&by='.$_GET['by'].'&type=1')}';
+	}
+}
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,115 @@
+<include file="Public:header" />
+<div class="container">
+	<include file="Public:alert" />	
+	<p class="view">
+		<b>财务导航：</b>
+		<a class="active" href="{:U('finance/receivables')}">应收款</a> | 
+		<a href="{:U('finance/payables')}">应付款</a> | 
+		<a href="{:U('finance/receivingorder')}">收款单</a> | 
+		<a href="{:U('finance/paymentorder')}">付款单</a> | 
+		<a href="{:U('finance/currentaccounts')}">往来账</a>
+	</p>
+	<div class="row">
+		<div class="span12">
+			<div class="pull-left">
+				<form id="doSearch" action="" method="post">
+				<input id="delete" type="submit" class="btn pull-left" value="删除"/> &nbsp;
+
+				&nbsp; &nbsp;从<input type="text" id="start_date" name="start_date" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd', maxDate:&quot;#F{$dp.$D('end_date')||'2020-10-01'}&quot;})" id="from" class="wdate"/>起
+				<input type="text" id="end_date" onFocus="WdatePicker({dateFmt:'yyyy-MM-dd', minDate:&quot;#F{$dp.$D(\'start_date\')}&quot;,maxDate:'2020-10-01'})" name="end_date" id="to" class="wdate"/>止
+				<input type="submit" id="searchbydate" class="btn btn-primary" name="search" value="查询"/>
+			</div>
+			<div class="pull-right">
+				<a class="btn btn-primary" href="{:U('finance/receivablesadd')}"> 添加财务活动</a>
+			</div>
+		</div>
+		<div class="span12">
+			<table class="table table-hover"> 
+				<if condition="$finance_list eq null"><tr><td>----暂无数据！----</td></tr><else />
+				<thead>
+					<tr>
+						<th><input class="check_all" id="check_all" type="checkbox" /></th>
+						<th>活动名</th>
+						<th>状态</th>
+						<th>状态</th>
+						<th>金额</th>						
+						<th>创建人</th>
+						<th>创建时间</th>
+						<th>操作</th>
+					</tr>
+				</thead>
+				<tfoot>
+					<tr>
+						<td colspan="8">
+							{$page}
+						</td>
+					</tr>
+				</tfoot> 
+				<tbody>
+					
+					<volist name="finance_list" id="vo">
+						<tr>
+							<td>
+								<input type="checkbox" class="check_list" name="finance_list[]" value="{$vo.finance_id}"/>
+							</td>
+							<td>
+								<a href="{:U('finance/receivablesview','id='.$vo['finance_id'])}">{$vo.name}</a>
+							</td>
+							<td>
+								<if condition="$vo.check_result eq 0">未付款<elseif condition="$vo.check_result eq 1"/>已付款</if>
+							</td>
+							<td>{$vo.price}</td>
+							<td>
+								<notempty name="vo.creator.user_name">
+									{$vo.creator.user_name} [{$vo.creator.department_name}-{$vo.creator.role_name}]
+								</notempty>
+							</td>
+							<td>
+								<if condition="$vo.create_time neq 0">{$vo.create_time|date="Y-m-d",###}</if>
+							</td>
+							<td>
+								<a href="{:U('finance/receivablesiew','id='.$vo['finance_id'])}">查看</a>&nbsp; <a href="{:U('finance/receivablesedit','id='.$vo['finance_id'])}">编辑</a>
+							</td>
+						</tr>
+					</volist>
+				</tbody>
+			</table>
+			</if>
+			</form>
+		</div> <!-- End #tab1 -->	
+	</div> <!-- End #main-content -->
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<script type="text/javascript">
+$("#dialog-import").dialog({
+	autoOpen: false,
+	modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+	$(function(){
+		$("#check_all").click(function(){
+			$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+		});
+		$("#delete").click(
+			function(){
+				a = $("#doSearch").attr('action','{:U("finance/delete")}');
+			}
+		);
+		$("#searchbydate").click(
+			function(){
+				a = $("#doSearch").attr('action','');
+			}
+		);
+		$("#import_excel").click(function(){
+			$('#dialog-import').dialog('open');
+			$('#dialog-import').load('{:U("finance/excelimport")}');
+		});
+	});
+	function changeContent(){
+		a = $("#select1  option:selected").val();
+		window.location.href="{:U('finance/index','by=')}"+a;
+	} 
+</script>
+<include file="Public:footer" />	

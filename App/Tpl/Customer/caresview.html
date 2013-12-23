@@ -1,0 +1,96 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>客户关怀详情</h4>
+	</div>
+	<include file="Public:alert"/>
+	<div class="row">
+		<div class="span12">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+						<td <if condition="C('ismobile') neq 1">colspan="4"<else/>colspan="2"</if>>
+							<p style="font-size: 14px;">
+								<a href="{:U('customer/caresedit', 'id='.$care['care_id'])}">编辑</a>&nbsp;|
+								<a href="{:U('customer/caresdelete', 'id='.$care['care_id'])}">删除</a>&nbsp;|
+								<a href="javascript:void(0)" onclick="javascript:history.go(-1)">返回</a>
+							</p>
+						</td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr><th <if condition="C('ismobile') neq 1">colspan="4"<else/>colspan="2"</if>>基本信息</th></tr>
+					<tr>
+						<td width="15%" class="tdleft">客户</td>
+						<td width="35%"><a target="_blank" href="{:U('customer/view','id='.$care['customer']['customer_id'])}">{$care.customer.name}</a></td>	
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td width="15%" class="tdleft">联系人</td>
+						<td width="35%"><a target="_blank" href="{:U('contacts/view','id='.$care['contacts']['contacts_id'])}">{$care.contacts.name}</a></td>
+					</tr>
+					<tr>
+						<td class="tdleft" width="15%">关怀主题</td>
+						<td width="35%" >{$care.subject}</td>
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td class="tdleft" width="15%">关怀日期</td>
+						<td width="35%" >
+							<if condition="$care.care_time gt 0">{$care.care_time|date='Y-m-d H:i',###}</if>
+						</td>
+					</tr>						
+					<tr>
+						<td class="tdleft">执行人</td>
+						<td>
+							<notempty name="care.owner.user_name"><a class="role_info" rel="{$care.owner.role_id}" href="javascript:void(0)">{$care.owner.user_name}</a></notempty>
+						</td>
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td class="tdleft" >关怀类型</td>
+						<td><if condition="$care['type'] == 'message'">
+												短信
+											<elseif condition="$care['type'] == 'phone'"/>
+												电话
+											<elseif condition="$care['type'] == 'email'"/>
+												邮件
+											<elseif condition="$care['type'] == 'other'"/>
+												其他
+											<else/>
+												无
+											</if></td>
+					</tr>
+					<tr>
+						<td class="tdleft">创建时间</td>
+						<td><if condition="$care['create_time'] neq 0">{$care.create_time|date='Y-m-d H:i:s',###}</if></td>
+						<if condition="C('ismobile') eq 1"></tr><tr></if>
+						<td class="tdleft">修改时间</td>
+						<td><if condition="$care['update_time'] neq 0">{$care.update_time|date='Y-m-d H:i:s',###}</if></td>
+					</tr>
+					<tr>
+						<td class="tdleft">关怀内容</td>
+						<td <if condition="C('ismobile') neq 1">colspan="3"</if>><notempty name="care.content"><pre>{$care.content}</pre></notempty></td>
+					</tr>
+					<tr>
+						<td class="tdleft" >备注</td>
+						<td <if condition="C('ismobile') neq 1">colspan="3"</if>><notempty name="care.description"><pre>{$care.description}</pre></notempty></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else />width=800;</if>
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(function(){
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+});
+</script>
+<include file="Public:footer" />

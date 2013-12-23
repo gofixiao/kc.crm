@@ -1,0 +1,79 @@
+<include file="Public:header" />
+	<div class="container">
+		<div class="row">
+			<div class="span12">
+				<h3>添加员工</h3>
+			</div>
+			<div class="span12">
+				<include file="Public:alert" />
+			</div>
+			<div class="span12">
+				<form id="add" class="form-horizontal" action="{:U('User/add')}" method="post">		
+					<p><input name="submit" class="btn btn-primary offset1" type="submit" value="保存"/>&nbsp; <input name="submit" class="btn btn-primary" type="submit" value="保存并新建"/> &nbsp;<input class="btn btn-primary" type="reset" value="取消"/></p>
+					<div class="control-group">
+						<label class="control-label" for="name">员工名&nbsp;<span style="color:red;">*</span></label>  
+						<div class="controls">
+							<input class="span3" type="text" name="name" id="name" value="{$value.name}"/>
+						</div>
+						<div name="name_tip" id="name_tip"></div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="name">密码&nbsp;<span style="color:red;">*</span></label>  
+						<div class="controls">
+							<input class="span3" type="password" name="password" id="password" value="{$value.password}"/>
+						</div>
+					</div>		
+					<div class="control-group">
+						<label class="control-label" for="name">确认密码&nbsp;<span style="color:red;">*</span></label>  
+						<div class="controls">
+							<input class="span3" type="password" name="repassword" id="repassword" value="{$value.repassword}"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="name">email&nbsp;<span style="color:red;">*</span></label>  
+						<div class="controls">
+							<input class="span3" id="email" name="email" type="text" value="{$value.email}"/>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="name">用户类别&nbsp;<span style="color:red;">*</span></label>  
+						<div class="controls">
+						<select name="category_id">
+							<option value="">--选择用户身份--</option>
+							<volist name="categoryList" id="vo">
+								<option <if condition="$value['category_id'] eq $vo['category_id']">selected="selected"</if> value="{$vo.category_id}">{$vo.name}</option>
+							</volist>
+						</select>
+						</div>
+					</div>	
+					<div class="control-group">
+						<label class="control-label" for="name">性别</label>  
+						<div class="controls">
+							<label class="radio inline">
+							  <input type="radio" name="sex" id="optionsRadios1" value="1" <if condition="$value['sex'] eq 1">checked</if>/>男
+							</label>
+							<label class="radio inline">
+								<input type="radio" name="sex" id="optionsRadios1" value="0" <if condition="$value['sex'] eq 0">checked</if>/>女
+							</label>
+						</div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="name">电话</label>  
+						<div class="controls">
+							<input class="span3" id="telephone" name="telephone" type="text" value="{$value.telephone}"/>
+						</div>
+						<div id="telephone_tip"></div>
+					</div>
+					<div class="control-group">
+						<label class="control-label" for="name">联系地址</label>  
+						<div class="controls">
+							<input class="span3" id="address" name="address" type="text" value="{$value.address}"/>
+						</div>
+						<div id="telephone_tip"></div>
+					</div>
+					<p><input class="btn btn-primary offset1" name="submit" type="submit" value="保存"/>&nbsp; <input class="btn btn-primary" name="submit" type="button" value="保存并新建"/> &nbsp;<input class="btn btn-primary" type="reset" value="取消"/></p>
+				</form>
+			</div>
+		</div>
+	</div>
+<include file="Public:footer" />	

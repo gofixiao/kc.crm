@@ -1,0 +1,55 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<h4>系统设置</h4>
+	</div>
+	<include file="Public:alert" />	
+	<div class="tabbable">
+		<ul class="nav nav-tabs">
+			<li><a href="{:U('setting/defaultInfo')}">系统基本设置</a></li>
+			<li><a href="{:U('setting/smtp')}">SMTP设置</a></li>
+			<li><a href="{:U('setting/fields')}">自定义字段设置</a></li>		
+			<li><a href="{:U('navigation/setting')}">系统菜单设置</a></li>
+			<li class="active"><a href="{:U('setting/weixin')}">微信公共账号设置</a></li>
+		</ul>
+		<div class="row">
+			<form class="form-horizontal" enctype="multipart/form-data" action="{:U('setting/weixin')}" method="post">
+				<table class="span6 table">
+					<thead>
+						<tr>
+							<th colspan="2">配置信息</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td class="tdleft">微信开发模式URL：</td>  
+							<td>
+								{:U('weixin/index','','','',true)}
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft">微信开发模式Token：</td>  
+							<td>
+								<input name="WEIXIN_TOKEN" type="text" value="{$weixin['WEIXIN_TOKEN']}"/>
+							</td>
+						</tr>
+						<tr>
+							<td class="tdleft">二维码关注图片：</td>  
+							<td>
+								<input name="WEIXIN_IMAGE" type="file"> (建议尺寸：160*160)
+								<if condition="$weixin['WEIXIN_IMAGE'] neq ''"><br/><img src="{$weixin['WEIXIN_IMAGE']}" width="160"/></if>
+							</td>
+						</tr>
+						<tr>
+							<td>&nbsp;</td>  
+							<td>
+								<input name="submit" class="btn btn-primary" type="submit" value="保存"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;不知道怎么操作？<a target="_blank" href="http://www.5kcrm.com/index.php?m=question&a=view&id=11">点击这里</a>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</form>
+		</div>
+	</div> <!-- End #main-content -->
+</div>
+<include file="Public:footer" />	

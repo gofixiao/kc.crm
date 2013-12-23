@@ -1,0 +1,433 @@
+<include file="Public:header" />
+<script src="__PUBLIC__/js/PCASClass.js" type="text/javascript"></script>
+<div class="container">
+	<div class="page-header" style="border:none; font-size:14px;">
+		<ul class="nav nav-tabs">
+		  <li class="active">
+			<a href="{:U('leads/index')}"><img src="__PUBLIC__/img/task_checked2.png"/>&nbsp; 线索</a>
+		  </li>
+		  <li><a href="{:U('leads/analytics')}"><img src="__PUBLIC__/img/tongji.png"/> &nbsp;统计</a></li>
+		  <li><a href="http://5kcrm.com/index.php?m=doc&a=index&id=13" target="_blank" style="font-size: 12px;color: rgb(255, 102, 0);"><img width="20px;" src="__PUBLIC__/img/help.png"/> 帮助</a></li>
+		</ul>
+	</div>
+	<include file="Public:alert" />
+	<p class="view"><b>视图：</b>
+	<img src=" __PUBLIC__/img/by_owner.png"/> <a href="{:U('leads/index')}" <if condition="$Think.get.by eq null">class="active"</if>>全部</a> |
+	<a href="{:U('leads/index','by=me')}" <if condition="$Think.get.by eq 'me'">class="active"</if>>我负责的</a> |
+	<a href="{:U('leads/index','by=sub')}" <if condition="$Think.get.by eq 'sub'">class="active"</if>>下属负责</a> | 
+	<a href="{:U('leads/index','by=subcreate')}" <if condition="$Think.get.by eq 'subcreate'">class="active"</if>>下属创建</a> | 
+	<a href="{:U('leads/index','by=transformed')}" <if condition="$Think.get.by eq 'transformed'">class="active"</if>>已转换线索</a> |
+	<a href="{:U('leads/index','by=public')}" <if condition="$Think.get.by eq 'public'">class="active"</if>>线索池</a>  &nbsp;  &nbsp; 
+	<img src="__PUBLIC__/img/by_time.png"/> 
+	<a href="{:U('leads/index','by=today')}" <if condition="$Think.get.by eq 'today'">class="active"</if>>今日需联系</a> | 
+	<a href="{:U('leads/index','by=week')}" <if condition="$Think.get.by eq 'week'">class="active"</if>>本周需联系</a> | 
+	<a href="{:U('leads/index','by=month')}" <if condition="$Think.get.by eq 'month'">class="active"</if>>本月需联系</a> |
+	<a href="{:U('leads/index','by=d7')}" <if condition="$Think.get.by eq 'd7'">class="active"</if>>7日未联系</a> | 
+	<a href="{:U('leads/index','by=d15')}" <if condition="$Think.get.by eq 'd15'">class="active"</if>>15日未联系</a> | 
+	<a href="{:U('leads/index','by=d30')}" <if condition="$Think.get.by eq 'd30'">class="active"</if>>30日未联系</a> | 	
+	<a href="{:U('leads/index','by=add')}" <if condition="$Think.get.by eq 'add'">class="active"</if>>最近创建</a> | 
+	<a href="{:U('leads/index','by=update')}" <if condition="$Think.get.by eq 'update'">class="active"</if>>最近修改</a>  &nbsp;  &nbsp; 
+	<a href="{:U('leads/index','by=deleted')}" <if condition="$Think.get.by eq 'deleted'">class="active"</if>><img src="__PUBLIC__/img/task_garbage.png"/> 回收站</a>
+	</p>
+	<div class="row">		
+		<div class="span12">
+			<ul class="nav pull-left">
+				<if condition="$Think.session.admin eq 1 or $Think.get.by neq 'deleted'">
+					<li class="pull-left"><a id="delete"  class="btn" style="margin-right: 5px;"><i class="icon-remove"></i>删除</a>&nbsp;&nbsp;</li>
+				</if>
+				<if condition="$Think.get.by eq 'public'">
+					<li class="pull-left">
+					<div class="btn-group pull-left">
+						<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+							&nbsp;批量操作
+							<span class="caret"></span>
+						</a>
+						<ul class="dropdown-menu">
+							<li><a id="batch_receive"  style="margin-right: 5px;" href="javascript:void(0)">批量领取</a></li>
+							<li><a id="batch_assign"  style="margin-right: 5px;" href="javascript:void(0)">批量分配</a></li>
+						</ul>
+					</div> &nbsp;&nbsp; 
+					</li>
+				</if>
+				<li class="pull-left">
+					<form class="form-inline" id="searchForm"  action="index.php" method="get">
+						<ul class="nav pull-left">
+							<li class="pull-left">
+								<select style="width:auto" id="field" onchange="changeCondition()" name="field">
+									<option class="" value="">--选择筛选条件--</option>
+									<volist name="field_list" id="v">
+										<option class="{$v['form_type']}" value="{$v[field]}" rel="leads">{$v[name]}</option>
+									</volist>
+									<if condition="$Think.get.by neq 'public'"><option class="role" value="owner_role_id">负责人</option></if>
+									<option class="date" value="create_time">创建时间</option>
+									<option class="date" value="update_time">修改时间</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="conditionContent" class="pull-left">
+								<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+									<option value="contains">包含</option>
+									<option value="not_contain">不包含</option>
+									<option value="is">是</option>
+									<option value="isnot">不是</option>						
+									<option value="start_with">开始字符</option>
+									<option value="end_with">结束字符</option>
+									<option value="is_empty">为空</option>
+									<option value="is_not_empty">不为空</option>
+								</select>&nbsp;&nbsp;
+							</li>
+							<li id="searchContent" class="pull-left"><input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;</li>
+							<li class="pull-left"><input type="hidden" name="m" value="leads"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<button type="submit" id="dosearch" class="btn"> <img src="__PUBLIC__/img/search.png"/>  搜索</button> &nbsp;</li>
+							<li class="pull-left">
+								<div class="btn-group">
+									<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+										<i class="icon-comment" style="color:rgb(107, 168, 192);"></i>&nbsp;发送短信
+										<span class="caret"></span>
+									</a>
+									
+									<ul class="dropdown-menu">
+										<li><a id="all_send"  href="javascript:void(0)">全部发送</a></li>
+										<li><a id="page_send" href="javascript:void(0)">当前页发送</a></li>
+										<li><a id="check_send" href="javascript:void(0)">当前页已选中发送</a></li>
+									</ul>
+								</div>
+								<div class="btn-group">
+									<a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+										<i class="icon-envelope" style="color:rgb(107, 168, 192);"></i>&nbsp;发送邮件
+										<span class="caret"></span>
+									</a>
+									
+									<ul class="dropdown-menu">
+										<li><a id="all_send_email"  href="javascript:void(0)">全部发送</a></li>
+										<li><a id="page_send_email" href="javascript:void(0)">当前页发送</a></li>
+										<li><a id="check_send_email" href="javascript:void(0)">当前页已选中发送</a></li>
+									</ul>
+								</div>
+							</li>
+						</ul>
+						<input type="hidden" name="act" id="act" value="search"/>
+					</form>
+				</li>				
+			</ul>
+			<div class="pull-right">					
+				<a href="{:U('leads/add')}" class="btn btn-primary"><i class="icon-plus"></i>&nbsp; 新建线索</a>&nbsp;
+				<div class="btn-group">
+					<button class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><i class="icon-wrench"> </i>&nbsp; 线索工具 <span class="caret"></span></button>
+					<ul class="dropdown-menu">
+						<li><a href="javascript:return(0);" id="import_excel"  class="link"><i class="icon-down"><i class="icon-upload"></i>导入线索</i></a></li>
+						<li><a href="{:U('leads/excelexport')}"  onclick="return window.confirm(&quot;您确定要导出线索吗 ?&quot;);" class="link"><i class="icon-download"></i>导出线索</a></li>
+						<if condition="session('admin')"><li><a id="set" class="link" href="javascript:void(0);"><i class="icon-pencil"></i>线索设置</a></li></if>
+					</ul>
+				</div>
+			</div>	
+		</div>
+		<div class="span12">				
+			<form id="form1" action="" method="post">
+			<input type="hidden" name="owner_id" id="hidden_owner_id" value="0"/>
+			<input type="hidden" name="message" id="hidden_message" value="0"/>
+			<input type="hidden" name="sms" id="hidden_sms" value="0"/>
+			<input type="hidden" name="email" id="hidden_email" value="0"/>
+			<table class="table table-hover">
+				<empty name="leadslist">
+					<tr><td>----暂无数据！----</td></tr>
+				<else/>
+					<thead>						
+						<tr id="childNodes_num">
+							<th><input type="checkbox" id="check_all"/></th>
+                            <volist name="field_array" id="vo">
+								<if condition="C('ismobile') eq 1 and $i  elt 1">
+									<th>{$vo.name}</th>
+								<elseif condition="C('ismobile') neq 1"/>
+									<th>{$vo.name}</th>
+								</if>
+								
+                            </volist>
+							<if condition="$Think.get.by neq 'public'"><th>负责人</th></if>
+							<th>创建人</th>
+							<th>创建时间</th>
+							<if condition="$Think.get.by neq 'public'"><th>距到期天数</th></if>
+							<if condition="$Think.get.by eq 'transformed'">
+								<th>转换客户</th>
+								<th>转换联系人</th>
+							<else/>
+								<th>操作</th>
+							</if>
+						</tr>
+					</thead>
+					<tfoot>
+						<tr>
+							<if condition="$Think.get.by eq 'transformed'">
+								<td id="td_colspan">{$page}</td>
+							<elseif condition="$Think.get.by eq 'deleted'" />
+								<td id="td_colspan">{$page}</td>
+							<else />
+								<td id="td_colspan">{$page}</td>
+							</if>							
+						</tr>
+					</tfoot>
+					<tbody>
+						<volist name="leadslist" id="vo">
+							<tr>
+								<td>
+									<input name="leads_id[]" class="check_list" type="checkbox" value="{$vo.leads_id}"/> 
+								</td>
+                                <volist name="field_array" id="v">
+									<if condition="C('ismobile') eq 1 and $i  elt 1">
+										<td>
+											<if condition="$v['field'] eq 'name'">
+											<a href="{:U('leads/view', 'id='.$vo['leads_id'])}">
+											<span style="color:#{$v['color']}">{$vo[$v['field']]}</span></a>
+											<elseif condition="$v['field'] eq 'nextstep_time' and $vo[$v['field']] lt (strtotime(date('Y-m-d'))+86400)  and $vo[$v['field']] egt 0 and  $vo[$v['field']] gt (strtotime(date('Y-m-d')))"/>
+												<span style="color:green">{$vo[$v['field']]|date='Y-m-d',###}</span>
+											<elseif condition="$v['field'] eq 'nextstep_time' and $vo[$v['field']] lt strtotime(date('Y-m-d')) and $vo[$v['field']] gt 0" />
+												<span style="color:red">{$vo[$v['field']]|date='Y-m-d',###}</span>
+											<elseif condition="$v['form_type'] eq 'datetime' and $vo[$v['field']] gt 0" />
+												<span style="color:#{$v['color']}">{$vo[$v['field']]|date='Y-m-d',###}</span>
+											<else />
+												<span style="color:#{$v['color']}"><notempty name="vo[$v['field']]">{$vo[$v['field']]}</notempty></span>
+											</if>
+										</td>
+									<elseif condition="C('ismobile') neq 1"/>
+										<td>
+											<if condition="$v['field'] eq 'name'">
+											<a href="{:U('leads/view', 'id='.$vo['leads_id'])}">
+											<span style="color:#{$v['color']}">{$vo[$v['field']]}</span></a>
+											<elseif condition="$v['field'] eq 'nextstep_time' and $vo[$v['field']] lt (strtotime(date('Y-m-d'))+86400)  and $vo[$v['field']] egt 0 and  $vo[$v['field']] gt (strtotime(date('Y-m-d')))"/>
+												<span style="color:green">{$vo[$v['field']]|date='Y-m-d',###}</span>
+											<elseif condition="$v['field'] eq 'nextstep_time' and $vo[$v['field']] lt strtotime(date('Y-m-d')) and $vo[$v['field']] gt 0" />
+												<span style="color:red">{$vo[$v['field']]|date='Y-m-d',###}</span>
+											<elseif condition="$v['form_type'] eq 'datetime' and $vo[$v['field']] gt 0" />
+												<span style="color:#{$v['color']}">{$vo[$v['field']]|date='Y-m-d',###}</span>
+											<else />
+												<span style="color:#{$v['color']}"><notempty name="vo[$v['field']]">{$vo[$v['field']]}</notempty></span>
+											</if>
+										</td>
+									</if>
+                                </volist>
+								<if condition="$Think.get.by neq 'public'">
+								<td>
+									<a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a>
+								</td>
+								</if>
+								<td>{$vo.creator.user_name}</a></td>
+								<td>{$vo.create_time|date='Y-m-d',###}</td>
+								<if condition="$Think.get.by neq 'public'">
+									<td><if condition="$vo['days'] elt 7"><font color="red">{$vo.days}天</font><else /><font color="blue">{$vo.days}天</font></if></td>
+								</if>
+								<if condition="$Think.get.by neq 'transformed'"><td>
+									<a href="{:U('leads/view', 'id=' . $vo['leads_id'])}">查看</a></if>&nbsp; 
+								<if condition="($Think.get.by neq 'transformed') and ($Think.get.by neq 'deleted')">
+									<a  target="_blank" href="{:U('customer/add','leads_id='.$vo['leads_id'])}">转换</a></if>&nbsp; 
+								<if condition="($Think.get.by neq 'transformed') and ($Think.get.by neq 'deleted')"><a href="{:U('leads/edit', 'id=' . $vo['leads_id'])}">编辑</a></if>&nbsp; 
+								<if condition="($Think.get.by neq 'transformed') and ($Think.get.by eq 'public')"><a href="{:U('leads/receive', 'id=' . $vo['leads_id'])}">领取</a></if>&nbsp;
+								<if condition="($Think.get.by neq 'transformed') and ($Think.get.by eq 'public')">
+									<a rel="{$vo['leads_id']}" class="fenpei" href="javascript:void(0)">分配</a>
+								</if>&nbsp;
+								<if condition="($Think.get.by neq 'transformed') and ($Think.get.by eq 'deleted')"><a href="{:U('leads/revert', 'id=' . $vo['leads_id'])}">还原</a></if>&nbsp; 
+								<if condition="$Think.get.by neq 'transformed'"></td></if>
+								<if condition="$Think.get.by eq 'transformed'">
+									<td><notempty name="vo.customer_id"><a href="{:U('customer/view', 'id=' . $vo['customer_id'])}">{$vo.customer_name}</a></notempty></td>
+									<td><notempty name="vo.contacts_id"><a href="{:U('contacts/view', 'id=' . $vo['contacts_id'])}">{$vo.contacts_name}</a></notempty></td>
+								</if>
+							</tr>
+						</volist>
+					</tbody>
+				</empty>	
+			</table>	
+			</form>	
+		</div>		
+	</div>
+</div>
+<div class="hide" id="dialog-import" title="导入数据">loading...</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<div class="hide" id="dialog-fenpei" title="线索分配">loading...</div>
+<div class="hide" id="dialog-assign" title="线索分配">loading...</div>
+<div class="hide" id="dialog-set" title="线索设置">loading...</div>
+<script type="text/javascript">
+<if condition="C('ismobile') eq 1">width=$('.container').width() * 0.9;<else/>width=800;</if>
+$("#dialog-import").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-set").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$("#dialog-fenpei").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100],
+	buttons: {
+		"Ok": function () {
+			$('#fenpei_form').submit();	
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	}
+});
+$("#dialog-assign").dialog({
+	autoOpen: false,
+	modal: true,
+	width: width,
+	maxHeight: 400,
+	position: ["center",100],
+	buttons: {
+		"Ok": function () {
+			var owner_role_id = $('input[name="owner_role_id"]').val();
+			var message_alert = $('input:checkbox[name="message_alert"]:checked').val();
+			var sms_alert = $('input:checkbox[name="sms_alert"]:checked').val();
+			var email_alert = $('input:checkbox[name="email_alert"]:checked').val();
+			
+			$("#hidden_owner_id").val(owner_role_id);
+			$("#hidden_message").val(message_alert);
+			$("#hidden_sms").val(sms_alert);
+			$("#hidden_email").val(email_alert);
+			
+			$("#form1").attr('action', '{:U("leads/batchassign")}');
+			$("#form1").submit();
+			$(this).dialog("close");
+		},
+		"Cancel": function () {
+			$(this).dialog("close");
+		}
+	}
+});
+$(function(){
+<if condition="$Think.get.field neq null">
+	$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+	$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+	$("#search").prop('value', '{$Think.get.search}');
+</if>
+	$("#check_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+	$('#delete').click(function(){
+		if(confirm('确认删除吗？')){
+			<if condition="$Think.session.admin eq 1 and $Think.get.by eq 'deleted'">
+				$("#form1").attr('action', '{:U("leads/completedelete")}');
+				$("#form1").submit();
+			<else />
+				$("#form1").attr('action', '{:U("leads/delete")}');
+				$("#form1").submit();
+			</if>
+		}
+	});
+	$('#batch_receive').click(function(){
+		if(confirm('确定要批量领取吗？')){
+			$("#form1").attr('action', '{:U("leads/batchReceive")}');
+			$("#form1").submit();
+		}
+	});
+	$('#batch_assign').click(function(){
+		$('#dialog-assign').dialog('open');
+		$('#dialog-assign').load('{:U("leads/assigndialog")}');
+	});
+	$("#set").click(function(){
+		$('#dialog-set').dialog('open');
+		$('#dialog-set').load('{:U("leads/set")}');
+	});
+	$('#transform').click(function(){
+		$("#form1").attr('action', '{:U("leads/transform")}');
+		$("#form1").submit();
+	});	
+	$("#import_excel").click(function(){
+		$('#dialog-import').dialog('open');
+		$('#dialog-import').load('{:U("leads/excelimport")}');
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+	$(".fenpei").click(function(){
+		$id = $(this).attr('rel');
+		$('#dialog-fenpei').dialog('open');
+		$('#dialog-fenpei').load('{:U("leads/fenpei","id=")}'+$id);
+	});
+	$("#check_send").click(function(){
+		var id_array = new Array();
+		$("input[class='check_list']:checked").each(function(){  
+			id_array.push($(this).val());
+		});
+		if(id_array.length == 0){
+			alert('您没有选中任何线索!');
+		}else{
+			var leads_ids = id_array.join(",");
+			window.open("{:U('setting/sendSms', 'model=leads&leads_ids=')}"+leads_ids);
+		}
+	});
+	$("#check_send_email").click(function(){
+		var id_array = new Array();
+		$("input[class='check_list']:checked").each(function(){  
+			id_array.push($(this).val());
+		});
+		if(id_array.length == 0){
+			alert('您没有选中任何线索!');
+		}else{
+			var leads_ids = id_array.join(",");
+			window.open("{:U('setting/sendemail', 'model=leads&leads_ids=')}"+leads_ids);
+		}
+	});
+	
+	$("#page_send").click(function(){
+		var id_array = new Array();
+		$("input[class='check_list']").each(function(){
+			id_array.push($(this).val());
+		});
+		if(id_array.length == 0){
+			alert('您没有选中任何线索!');
+		}else{
+			var leads_ids = id_array.join(",");
+			window.open("{:U('setting/sendSms', 'model=leads&leads_ids=')}"+leads_ids);
+		}
+	});
+	$("#page_send_email").click(function(){
+		var id_array = new Array();
+		$("input[class='check_list']").each(function(){
+			id_array.push($(this).val());
+		});
+		if(id_array.length == 0){
+			alert('您没有选中任何线索!');
+		}else{
+			var leads_ids = id_array.join(",");
+			window.open("{:U('setting/sendemail', 'model=leads&leads_ids=')}"+leads_ids);
+		}
+	});
+	
+	$("#all_send").click(function(){
+		$("#act").val('sms');
+		$("#searchForm").submit();
+	});
+	$("#all_send_email").click(function(){
+		window.open("{:U('setting/sendemail', 'model=leads&leads_ids=all')}");
+	});
+	
+	$("#dosearch").click(function(){
+		result = checkSearchForm();
+		if(result) $("#searchForm").submit();
+	});
+});
+<if condition="$leadslist neq null">
+	$nodes_num = document.getElementById("childNodes_num").children.length;
+	$("#td_colspan").attr('colspan',$nodes_num);
+</if>
+</script>
+<include file="Public:footer" />

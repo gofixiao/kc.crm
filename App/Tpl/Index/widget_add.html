@@ -1,0 +1,49 @@
+<form class="form-horizontal" action="{:U('index/widget_add')}" method="post" >
+	<div class="control-group">
+		<label class="control-label">选择模块</label>
+		<div class="controls">
+			<select name="widget">
+				<option value="Leads">线索</option>
+				<option value="Customer">客户</option>
+				<option value="Contacts">联系人</option>
+				<option value="Business">商机</option>
+				<option value="Task">任务</option>
+				<option value="Event">日程</option>
+				<option value="Receivables">应收款</option>
+				<option value="Payables">应付款</option>
+				<option value="Receivingorder">收款单</option>
+				<option value="Paymentorder">付款单</option>
+				<option value="Product">产品</option>
+				<option value="Knowledge">知识</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">组件名</label>
+		<div class="controls">
+			<input type="text" id="title" name="title"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">宽度</label>
+		<div class="controls">
+			<select name="style">
+				<option selected="selected" value="1">一栏</option>
+				<option value="2">半栏</option>
+			</select>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label">显示数量</label>
+		<div class="controls">
+			<input type="text" id="limit" name="limit" value="10"/>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label"></label>
+		<div class="controls">
+			<input name="submit" class="btn btn-primary" type="submit" value="保存"/> &nbsp;
+			<input name="submit" class="btn" type="button" onclick="javascript:$('#dialog-message').dialog('close');" value="取消"/>
+		</div>
+	</div>
+</form>

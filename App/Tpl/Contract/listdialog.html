@@ -1,0 +1,142 @@
+<div>
+	<ul class="nav pull-left">
+		<li class="pull-left">
+			<select id="field" style="width:auto" onchange="changeCondition()" name="field">
+				<option class="all" value="all">任意字段</option>
+				<option class="word" value="number">合同编号</option>
+				<option class="role" value="owner_role_id">负责人</option>
+				<option class="customer" value="customer_id">客户</option>
+				<option class="date" value="create_time">创建日期</option>
+				<option class="date" value="update_time">修改日期</option>
+				<option class="date" value="due_time">修改日期</option>
+				<option class="number" value="price">报价</option>
+				<option class="word" value="description">备注</option>
+			</select>&nbsp;&nbsp;
+		</li>
+		<li id="conditionContent" class="pull-left">
+			<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+				<option value="contains">包含</option>
+				<option value="is">是</option>								
+				<option value="start_with">开始字符</option>
+				<option value="end_with">结束字符</option>
+				<option value="is_empty">为空</option>
+			</select>&nbsp;&nbsp;
+		</li>
+		<li id="searchContent" class="pull-left">
+			<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+		</li>
+		<li class="pull-left">
+			<button type="submit" onclick="d_changeCondition(0)" class="btn">搜索</button>
+		</li>
+		&nbsp;<a target="_blank" href="{:U('contract/add')}">新建合同</a>
+	</ul>
+</div>
+<p>&nbsp;</p>
+<empty name="contractList">
+	<div class="alert">暂无数据！</div>
+<else/>
+	<table class="table table-hover">
+		<if condition="$contractList eq null">
+			<tr><td>----暂无数据！----</td></tr>
+		<else/>
+		<thead>
+			<tr> 
+				<th></th>
+				<th>合同编号</th>
+				<th class="hide"></th>
+				<th>客户</th>
+				<th>报价</th>
+			</tr>
+		</thead> 
+		<tfoot id="footer">
+			<tr>
+				<td colspan="4">
+					<div class="row pagination">
+						<div class="span2"><span id="count">{$count_num}</span> 条记录 <span id="p">1</span>/<span id="total_page">{$total}</span> 页</div>
+						<div class="span4">
+							<div><ul id="changepage">
+								<li><span class='current'>首页</span></li><li><span>« 上一页</span></li>
+								<if condition="1 lt $total">
+									<li><a class="page" href="javascript:void(0)" rel="2">下一页 »</a></li>
+								<else />
+									<li><span>下一页 »</span></li>
+								</if>
+							</ul></div>
+						</div>
+					</div>
+				</td>
+			</tr>
+		</tfoot>
+		<tbody id="load" class="hide">
+			<tr><td class="tdleft" <if condition="C('ismobile') neq 1">colspan="6"<else />colspan="4"</if> style=" height:300px;text-align:center"><img src="./Public/img/load.gif"></td></tr>
+		</tbody>
+		<tbody id="data">
+			<volist name="contractList" id="vo">
+				<tr>
+					<td><input type="radio" name="contract" value="{$vo.contract_id}"/></td>
+					<td>{$vo.number}</td>
+					<td class="hide">{$vo.customer_id}</td>
+					<td>{$vo.customer_name}</td>
+					<td>{$vo.price}</td>
+				</tr>
+			</volist>
+		</tbody>
+		</if>
+	</table>
+	
+<script type="text/javascript">
+	$('.page').click(function(){
+		a = $(this).attr('rel');
+		d_changeCondition(a);
+	});
+	function d_changeCondition(p){
+		$('#data').addClass('hide');
+		$('#load').removeClass('hide');
+		
+		field = $('#field').val();
+		condition = $('#condition').val();
+		asearch = $("#search").val();
+		$.ajax({
+			type:'get',
+			url:'index.php?m=contract&a=changecontent&field='+field+'&search='+asearch+'&condition='+condition+'&p='+p,
+			async:false,
+			success:function(data){
+				temp = '';
+				if(data.data.list != null){
+					$.each(data.data.list, function(k, vo){
+						temp += '<tr><td><input type="radio" name="contract" value="'+vo.contract_id+'"/></td><td>'+vo.number+'</td><td class="hide">'+vo.customer_id+'</td><td>'+vo.customer_name+'</td><td>'+vo.price+'</td></tr>';
+					});
+					changepage = "";
+					if(data.data.p == 1){
+						changepage = "<li><span class='current'>首页</span></li><li><span>« 上一页 </span></li>";
+						if(data.data.p < data.data.total){
+							changepage += "<li><a class='page' href='javascript:void(0)' rel='"+(data.data.p+1)+"'>下一页 »</a></li>";
+						}else{
+							changepage += "<li><span>下一页 »</span></li>";
+						}
+					}else if(data.data.p == data.data.total){
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><span>下一页 »</span></li>";
+					}else{
+						changepage = "<li><a class='page' href='javascript:void(0)' rel='1'>首页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p-1)+"'>« 上一页</a></li><li><a class='page' href='javascript:void(0)' rel='"+(data.data.p+1)+"'>下一页 »</a></li>";
+					}
+					$('#p').html(data.data.p);
+					$('#changepage').html(changepage);
+					$('#count').html(data.data.count);
+					$('#total_page').html(data.data.total);
+					$('#data').html(temp);
+					$('.page').click(function(){
+						a = $(this).attr('rel');
+						d_changeCondition(a);
+					});
+				}else{
+					$('#data').html('<tr><td colspan="4">没有找到您要的结果！</tr>');
+					$('#footer').addClass('hide');
+				}
+				$('#load').addClass('hide');
+				$('#data').removeClass('hide');
+			},
+			dataType:'json'
+		});		
+	}
+</script>
+</empty>

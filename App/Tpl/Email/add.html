@@ -1,0 +1,28 @@
+
+<form action="{:U('email/add')}" method="post">
+	<table class="table" border="0" cellspacing="1" cellpadding="0">
+		<tfoot>
+			<tr>
+				<td colspan="2"><input class="btn btn-primary" name="submit" type="submit" value="保存"/> &nbsp; <input class="btn btn" type="button" onclick="javascript:history.go(-1)" value="返回"/></td>
+			</tr>
+		</tfoot>
+		<tbody>
+			<th colspan="2">基本信息</th>
+			<tr>
+				<td class="tdleft">模版名称</td>
+				<td><input type="text" name="subject" class="span4" value=""/></td>
+			</tr>
+			<tr>
+				<td class="tdleft">邮件主题</td>
+				<td><input type="text" name="title" class="span4" value=""/></td>
+			</tr>
+			<tr>
+				<td class="tdleft">邮件内容：</td>
+				<td>
+					如需客户姓名请在内容中以"<font color="red">{</font><font color="red">name}</font>"(红色字体)代替<br/>
+					<textarea name="content" id="content" style="width: 400px; height: 100px;"></textarea>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+</form>

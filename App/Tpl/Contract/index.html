@@ -1,0 +1,173 @@
+<include file="Public:header" />
+<div class="container">
+	<!-- Docs nav ================================================== -->
+	<div class="page-header">
+		<h4>合同</h4>
+	</div>
+	<include file="Public:alert" />
+	<p class="view"><b>视图：</b>
+	<img src=" __PUBLIC__/img/by_owner.png"/> <a href="{:U('contract/index')}" <if condition="$Think.get.by eq null">class="active"</if>>全部</a> |
+	<a href="{:U('contract/index','by=me')}" <if condition="$Think.get.by eq 'me'">class="active"</if>>我负责的</a> | 
+	<a href="{:U('contract/index','by=sub')}" <if condition="$Think.get.by eq 'sub'">class="active"</if>>下属负责的</a> | 
+	<a href="{:U('contract/index','by=create')}" <if condition="$Think.get.by eq 'create'">class="active"</if>>我创建的</a> |
+	<a href="{:U('contract/index','by=subcreate')}" <if condition="$Think.get.by eq 'subcreate'">class="active"</if>>下属创建的</a> &nbsp; &nbsp; &nbsp; &nbsp;
+	<img src="__PUBLIC__/img/by_time.png"/> 
+	<a href="{:U('contract/index','by=today')}" <if condition="$Think.get.by eq 'today'">class="active"</if>>今日签约</a> | 
+	<a href="{:U('contract/index','by=week')}" <if condition="$Think.get.by eq 'week'">class="active"</if>>本周签约</a> | 
+	<a href="{:U('contract/index','by=month')}" <if condition="$Think.get.by eq 'month'">class="active"</if>>本月签约</a>   &nbsp;
+	<a href="{:U('contract/index','by=add')}" <if condition="$Think.get.by eq 'add'">class="active"</if>>最近创建</a> | 
+	<a href="{:U('contract/index','by=update')}" <if condition="$Think.get.by eq 'update'">class="active"</if>>最近更新</a>  &nbsp;  &nbsp;   &nbsp;  &nbsp; 
+	
+	<a href="{:U('contract/index','by=deleted')}" <if condition="$Think.get.by eq 'deleted'">class="active"</if>><img src="__PUBLIC__/img/task_garbage.png"/> 回收站</a> &nbsp; &nbsp;
+	</p>
+	<div class="row">
+		<div class="span12">
+			<ul class="nav pull-left">
+				<li class="pull-left"><a id="delete"  class="btn" style="margin-right: 5px;"><i class="icon-remove"></i>删除</a></li>
+				<li class="pull-left">
+				<form class="form-inline" id="searchForm" onsubmit="return checkSearchForm();" action="" method="get">
+					<ul class="nav pull-left">
+						<li class="pull-left">
+							<select id="field" style="width:auto" onchange="changeCondition()" name="field">
+								<option class="all" value="all">任意字段</option>
+								<option class="word" value="number">合同编号</option>
+								<option class="role" value="owner_role_id">负责人</option>
+								<option class="customer" value="customer_id">客户</option>
+								<option class="date" value="create_time">创建日期</option>
+								<option class="date" value="update_time">修改日期</option>
+								<option class="date" value="due_time">修改日期</option>
+								<option class="number" value="price">报价</option>
+								<option class="word" value="description">备注</option>
+							</select>&nbsp;&nbsp;
+						</li>
+						<li id="conditionContent" class="pull-left">
+							<select id="condition" style="width:auto" name="condition" onchange="changeSearch()">
+								<option value="contains">包含</option>
+								<option value="is">是</option>								
+								<option value="start_with">开始字符</option>
+								<option value="end_with">结束字符</option>
+								<option value="is_empty">为空</option>
+							</select>&nbsp;&nbsp;
+						</li>
+						<li id="searchContent" class="pull-left">
+							<input id="search" type="text" class="input-medium search-query" name="search"/>&nbsp;&nbsp;
+						</li>
+						<li class="pull-left">
+							<input type="hidden" name="m" value="contract"/>
+							<if condition="$Think.get.by neq null"><input type="hidden" name="by" value="{$Think.get.by}"/></if>
+							<button type="submit" class="btn"> <img src="__PUBLIC__/img/search.png"/>  搜索</button>
+						</li>
+					</ul>
+				</form>
+				</li>
+			</ul>
+			<div class="pull-right">
+				<a class="btn btn-primary" href="{:U('contract/add')}"><i class="icon-plus"></i>&nbsp;添加合同</a>
+			</div>
+		</div>
+		<div class="span12">
+			<form id="form1"  method="post">
+			<table class="table table-hover">
+				<notempty name="list">
+					<thead>
+						<tr>
+							<th><input class="check_all" id="check_all" type="checkbox" /> &nbsp;</th>
+							<th>合同编号</th>
+							<th>客户</th>
+							<if condition="C('ismobile') neq 1">
+							<th>联系人</th>
+							<th>负责人</th>
+							<th>签约日期</th>
+							<th>报价</th>
+							<th>状态</th></if>
+							<if condition="C('ismobile') neq 1 and $Think.get.by eq 'deleted'">
+								<th>删除人</th>
+								<th>删除时间</th>
+							<elseif condition="C('ismobile') neq 1" />
+								<th>创建日期</th>
+							</if>
+							
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tfoot>
+							<tr><td colspan="11">{$page}</td></tr>
+					</tfoot>
+					<tbody>
+						<volist name="list" id="vo">
+							<tr>
+								<td><input type="checkbox" class="check_list" name="contract_id[]" value="{$vo.contract_id}"/> &nbsp;
+								</td>
+								<td><a href="{:U('contract/view','id='.$vo['contract_id'])}">{$vo.number}</a></td>
+								<td><a href="{:U('customer/view','id='.$vo['customer_id'])}">{$vo.customer_name}</a></td>
+								<if condition="C('ismobile') neq 1">
+								<td><a href="{:U('contacts/view','id='.$vo['contacts_id'])}">{$vo.contacts_name}</a></td>
+								<td><notempty name="vo.owner.user_name"><a class="role_info" rel="{$vo.owner.role_id}" href="javascript:void(0)">{$vo.owner.user_name}</a></notempty></td>
+								<td><notempty name="vo.due_time">{$vo.due_time|date="Y-m-d H:i",###}</notempty></td>
+								<td>{$vo.price}元</td>
+								<td>{$vo.status}</td>
+								</if>
+								<if condition="C('ismobile') neq 1 and $Think.get.by eq 'deleted'">
+									<td><notempty name="vo.deletor.user_name"><a class="role_info" rel="{$vo.deletor.role_id}" href="javascript:void(0)">{$vo.deletor.user_name}</a></notempty></td>
+									<td><notempty name="vo.delete_time">{$vo.delete_time|date="Y-m-d H:i",###}</notempty></td>
+								<elseif condition="C('ismobile') neq 1" />
+									<td><notempty name="vo.create_time">{$vo.create_time|date="Y-m-d H:i",###}</notempty></td>
+								</if>
+
+								<td>
+									<a href="{:U('contract/view','id='.$vo['contract_id'])}" title="查看">查看</a>
+									<if condition="$Think.get.by neq 'deleted'">
+										<a href="{:U('contract/edit','id='.$vo['contract_id'])}">编辑</a>
+									<else />
+										<a href="{:U('contract/revert','id='.$vo['contract_id'])}" title="还原">还原</a>
+									</if>
+								</td>
+							</tr> 
+						</volist>
+					</tbody>
+				<else/>
+					<tr><td>----暂无数据！----</td></tr>
+				</notempty>
+			</table>
+			</form>
+		</div>
+	</div>
+</div>
+<div class="hide" id="dialog-role-info" title="员工信息">loading...</div>
+<script type="text/javascript">
+$("#dialog-role-info").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center",100]
+});
+$(function(){
+	<if condition="$Think.get.field neq null">
+		$("#field option[value='{$Think.get.field}']").prop("selected", true);changeCondition();
+		$("#condition option[value='{$Think.get.condition}']").prop("selected", true);changeSearch();
+		$("#search").prop('value', '{$Think.get.search}');
+	</if>
+	
+	$("#check_all").click(function(){
+		$("input[class='check_list']").prop('checked', $(this).prop("checked"));
+	});
+	$('#delete').click(function(){
+		if(confirm('你确定要删除?')){
+		<if condition="$Think.session.admin eq 1 and $Think.get.by eq 'deleted'">
+			$("#form1").attr('action', '{:U("contract/completedelete")}');
+			$("#form1").submit();
+		<else />
+			$("#form1").attr('action', '{:U("contract/delete")}');
+			$("#form1").submit();
+		</if>
+		}
+	});
+	$(".role_info").click(function(){
+		$role_id = $(this).attr('rel');
+		$('#dialog-role-info').dialog('open');
+		$('#dialog-role-info').load('{:U("user/dialoginfo","id=")}'+$role_id);
+	});
+});
+</script>
+<include file="Public:footer" />

@@ -1,0 +1,150 @@
+<include file="Public:header" />
+<div class="container">
+	<div class="page-header">
+		<select id="select1" onchange="changeContent()">
+			<option>--选择查看内容--</option>
+			<option value="1">权限管理</option>
+			<option value="2">权限模块管理</option>
+		</select>
+	</div>
+	<include file="Public:alert" />	
+	<div class="row">
+		<form action="{:U('permission/control_delete')}" method="POST">
+		<div class="span12">
+			<div class="bulk-actions align-left">
+				<ul class="nav pull-left">					
+					<li class="dropdown">
+						<a href="#" class="btn dropdown-toggle" data-toggle="dropdown">按模块查看操作<b class="caret"></b></a>
+						<ul class="dropdown-menu">
+							<volist name="moduleList" id="vo">
+							<li><a href="javascript:void(0);" class="link" onclick="window.location='{:U('Permission/index','module_id='.$vo['module_id'])}'">{$vo.name}</a></li>
+							</volist>
+						</ul>
+					</li> 
+				</ul>
+				&nbsp; <input type="submit" class="btn" value="删除"/>
+				<div class="pull-right">
+					<a id="add_control" class="btn btn-primary" href="javascript:void(0)">添加操作</a>
+					&nbsp; <a id="add_module" class="btn btn-primary" href="javascript:void(0)">添加模块</a>
+				</div>
+			</div>
+			
+		</div>
+		<div class="span12">
+			<table class="table table-hover">
+				<thead>
+					<tr>
+					   <th><input type="checkbox" id="control_all" name='control_all'"/></th>
+					   <th>操作名</th>
+					   <th>Module</th>
+					   <th>Action</th>
+					   <th>参数</th>
+					   <th>描述</th>
+					   <th>操作</th>
+					</tr> 
+				</thead>
+				<tbody>
+					<volist name="controlList" id="vo">
+					<tr>
+						<td>
+							<input type="checkbox" class="control_list" name='control_list[]' value="{$vo.control_id}"/>
+						</td>
+						<td>{$vo.name}</td>
+						<td>{$vo.m}</td>
+						<td>{$vo.a}</td>
+						<td>{$vo.parameter}</td>
+						<td>{$vo.description}</td>
+						<td><a rel="{$vo.control_id}" class="edit_control" href="javascript:void(0)">编辑</a>
+							<a rel="{$vo.control_id}" class="authorize" href="javascript:void(0)">岗位授权</a></td>
+					</tr>
+					</volist>
+				</tbody>
+			</table>
+			</form>
+		</div>
+		<div class="span12">
+			{$page}
+		</div>
+	</div>
+</div>
+<div id="dialog1" class="hide" title="根据岗位授权">loading...</div>	
+<div id="dialog2" class="hide" title="添加操作">loading...</div>	
+<div id="dialog3" class="hide" title="编辑操作">loading...</div>	
+<div id="dialog4" class="hide" title="添加模块">loading...</div>	
+<script>
+$("#dialog1").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+$("#dialog2").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600, 
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+
+$("#dialog3").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+$("#dialog4").dialog({
+    autoOpen: false,
+    modal: true,
+	width: 600,
+	maxHeight: 400,
+	position: ["center", 100]
+});
+
+function changeContent(){
+	a = $("#select1  option:selected").val();
+	if(a=='1'){
+		window.location.href="{:U('permission/index')}";
+	}else if(a=='2'){
+		window.location.href="{:U('permission/module')}";
+	}
+}
+
+function searchControl(){
+	var objCategory=document.getElementById("module");
+	var id=objCategory.options[objCategory.selectedIndex].value;
+	window.location="{:U('Permission/index','module_id=')}"+id;
+}
+
+function deleteControl(id,name){
+	if(confirm("确定删除操作"+name+"吗?")){
+		window.location="{:U('Permission/control_delete','id=')}"+id;
+	}
+}
+
+$(function(){
+	$("#control_all").click(function(){
+		$("input[class='control_list']").prop('checked', $(this).prop("checked"));
+	});
+	$("#add_control").click(function(){
+		$('#dialog2').dialog('open');$('#dialog2').load('{:U('permission/control_add')}');
+	});
+	$("#add_module").click(function(){
+		$('#dialog4').dialog('open');$('#dialog4').load('{:U('permission/module_add')}');
+	});
+	$(".edit_control").click(function(){
+		id = $(this).attr("rel");
+		$('#dialog3').dialog('open');$('#dialog3').load('{:U('permission/control_edit','id=')}' + id);
+	});
+	$(".authorize").click(function(){
+		id = $(this).attr("rel");
+		$('#dialog1').dialog('open');$('#dialog1').load('{:U('permission/authorize','by=permission&control_id=')}' + id);
+	});
+	
+})
+</script>	
+<include file="Public:footer" />
